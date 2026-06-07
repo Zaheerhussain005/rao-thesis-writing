@@ -1,0 +1,53 @@
+% ============================================================
+%  Abstract
+% ============================================================
+\chapter*{Abstract}
+\addcontentsline{toc}{chapter}{Abstract}
+\thispagestyle{plain}
+
+Groundwater is the primary source of freshwater for irrigation and domestic
+use across the semi-arid Pothohar Plateau of northern Punjab, Pakistan, yet
+its spatial distribution remains poorly mapped at a regional scale. This
+thesis develops a machine learning (ML) framework for groundwater potential
+mapping (GWPM) that extends the knowledge-based weighted-overlay approach of
+Waqas et al.\ \cite{waqas2022chakwal} from a single district to the full
+five-district plateau (Chakwal, Rawalpindi, Attock, Jhelum, and Mianwali;
+$\approx$\SI{25000}{\kilo\meter\squared}).
+
+Nine geo-environmental features --- elevation, slope, aspect, topographic
+wetness index (TWI), NDVI, NDWI, long-term rainfall, soil texture, and land
+surface temperature --- were derived from Landsat~8, SRTM, CHIRPS, MODIS, and
+SoilGrids using Google Earth Engine at 30~m resolution, yielding \npixels{}
+valid pixels. A knowledge-based weighted overlay generated three-class
+groundwater potential labels (Low, Medium, High), from which a balanced
+training set of 450{,}000 samples was drawn. Four classifiers --- Random
+Forest, XGBoost, LightGBM, and a soft-voting ensemble --- were trained and
+evaluated.
+
+XGBoost achieved the best performance (test accuracy 99.12\%, macro
+$F_1=0.991$, Cohen's $\kappa=0.987$, ROC-AUC $=0.9998$) and was applied to
+the full plateau, classifying 20\% of the area as High, 40\% as Medium, and
+40\% as Low potential. Because the training labels and model inputs share
+the same feature space, internal accuracy primarily measures reproducibility
+of the overlay; the model's real-world credibility was therefore established
+through \emph{spatial-realism validation} against independent evidence:
+(i)~4/4 published alluvial groundwater sites were correctly classified as
+Medium or High; (ii)~alluvial rain-gauge stations showed significantly higher
+predicted potential than non-alluvial stations (Mann--Whitney $p=0.023$);
+(iii)~district-level predictions followed the expected hydrogeological
+gradient (Spearman $\rho=1.00$, Rawalpindi 61\% High vs.\ Chakwal 4\% High);
+and (iv)~the High-potential fraction (20\%) was consistent with two
+independent 2025 AHP studies of the same region.
+
+The resulting 30~m groundwater potential map identifies the Jhelum, Soan, and
+Indus alluvial corridors as priority zones for well development. The study
+demonstrates that ML can replace manual weighted overlay while retaining
+hydrogeological interpretability, and provides a reproducible, scalable
+framework for regional groundwater assessment in data-scarce settings.
+
+\vspace{0.4cm}
+\noindent\textbf{Keywords:} Groundwater potential mapping; Machine learning;
+XGBoost; Random Forest; Google Earth Engine; Remote sensing; Pothohar Plateau;
+Pakistan; Spatial validation.
+
+\cleardoublepage

@@ -1,0 +1,398 @@
+% ============================================================
+% references.bib — ML-Based Groundwater Potential Mapping
+% Pothohar Plateau, Punjab, Pakistan
+% Keys match papers.json (34 curated refs) + Waqas 2022 reference
+% paper + two foundational method papers (ke2017, beven1979).
+% Style: IEEEtran (numeric).
+% ============================================================
+
+% ── Reference paper this thesis extends ──────────────────────
+@article{waqas2022chakwal,
+  author  = {Waqas, Muhammad and Ahmad, Sajid Rashid and Majid, Muhammad},
+  title   = {Assessment of Groundwater Potential in District {Chakwal}, {Punjab}: A {GIS} and Remote Sensing Perspective},
+  journal = {Pakistan Journal of Scientific and Industrial Research Series A: Physical Sciences},
+  year    = {2022},
+  volume  = {65A},
+  number  = {2},
+  pages   = {128--134}
+}
+
+% ── Foundational ML ──────────────────────────────────────────
+@inproceedings{chen2016xgboost,
+  author    = {Chen, Tianqi and Guestrin, Carlos},
+  title     = {{XGBoost}: A Scalable Tree Boosting System},
+  booktitle = {Proceedings of the 22nd ACM SIGKDD International Conference on Knowledge Discovery and Data Mining},
+  year      = {2016},
+  pages     = {785--794},
+  doi       = {10.1145/2939672.2939785}
+}
+
+@article{liaw2007randomforest,
+  author  = {Liaw, Andy and Wiener, Matthew C.},
+  title   = {Classification and Regression by {randomForest}},
+  journal = {R News},
+  year    = {2007},
+  volume  = {2},
+  number  = {3},
+  pages   = {18--22}
+}
+
+@article{tyralis2019randomforests,
+  author  = {Tyralis, Hristos and Papacharalampous, Georgia and Langousis, Andreas},
+  title   = {A Brief Review of Random Forests for Water Scientists and Practitioners and Their Recent History in Water Resources},
+  journal = {Water},
+  year    = {2019},
+  volume  = {11},
+  number  = {5},
+  pages   = {910},
+  doi     = {10.3390/w11050910}
+}
+
+@article{chicco2020mcc,
+  author  = {Chicco, Davide and Jurman, Giuseppe},
+  title   = {The advantages of the {Matthews} correlation coefficient ({MCC}) over {F1} score and accuracy in binary classification evaluation},
+  journal = {BMC Genomics},
+  year    = {2020},
+  volume  = {21},
+  pages   = {6},
+  doi     = {10.1186/s12864-019-6413-7}
+}
+
+% ── Foundational method refs (NOT in papers.json — verify) ───
+@inproceedings{ke2017lightgbm,
+  author    = {Ke, Guolin and Meng, Qi and Finley, Thomas and Wang, Taifeng and Chen, Wei and Ma, Weidong and Ye, Qiwei and Liu, Tie-Yan},
+  title     = {{LightGBM}: A Highly Efficient Gradient Boosting Decision Tree},
+  booktitle = {Advances in Neural Information Processing Systems (NeurIPS)},
+  year      = {2017},
+  volume    = {30},
+  pages     = {3146--3154}
+}
+
+@article{beven1979topmodel,
+  author  = {Beven, Keith J. and Kirkby, Mike J.},
+  title   = {A physically based, variable contributing area model of basin hydrology},
+  journal = {Hydrological Sciences Bulletin},
+  year    = {1979},
+  volume  = {24},
+  number  = {1},
+  pages   = {43--69},
+  doi     = {10.1080/02626667909491834}
+}
+
+% ── GW Potential Mapping (GIS/AHP/statistical baselines) ─────
+@article{arulbalaji2019gisahp,
+  author  = {Arulbalaji, P. and Padmalal, D. and Sreelash, K.},
+  title   = {{GIS} and {AHP} Techniques Based Delineation of Groundwater Potential Zones: a case study from {Southern Western Ghats, India}},
+  journal = {Scientific Reports},
+  year    = {2019},
+  volume  = {9},
+  pages   = {2082},
+  doi     = {10.1038/s41598-019-38567-x}
+}
+
+@article{arabameri2018shahroud,
+  author  = {Arabameri, Alireza and Rezaei, Khalil and Cerd{\`a}, Artemi and others},
+  title   = {{GIS}-based groundwater potential mapping in {Shahroud} plain, {Iran}: A comparison among statistical (bivariate and multivariate), data mining and {MCDM} approaches},
+  journal = {Science of the Total Environment},
+  year    = {2018},
+  volume  = {658},
+  pages   = {160--177},
+  doi     = {10.1016/j.scitotenv.2018.12.115}
+}
+
+@article{mallick2019fuzzyahp,
+  author  = {Mallick, Javed and Khan, Roohul Abad and Ahmed, Mohd. and others},
+  title   = {Modeling Groundwater Potential Zone in a Semi-Arid Region of {Aseer} Using Fuzzy-{AHP} and Geoinformation Techniques},
+  journal = {Water},
+  year    = {2019},
+  volume  = {11},
+  number  = {12},
+  pages   = {2656},
+  doi     = {10.3390/w11122656}
+}
+
+@article{das2018pravara,
+  author  = {Das, Sumit and Pardeshi, Sudhakar D.},
+  title   = {Integration of different influencing factors in {GIS} to delineate groundwater potential areas using {IF} and {FR} techniques: a study of {Pravara} basin, {Maharashtra, India}},
+  journal = {Applied Water Science},
+  year    = {2018},
+  volume  = {8},
+  pages   = {197},
+  doi     = {10.1007/s13201-018-0848-x}
+}
+
+@article{benjmel2020morocco,
+  author  = {Benjmel, Khalid and Amraoui, Fouad and Boutaleb, Said and others},
+  title   = {Mapping of Groundwater Potential Zones in Crystalline Terrain Using Remote Sensing, {GIS} Techniques, and Multicriteria Data Analysis ({Ighrem} Region, {Western Anti-Atlas, Morocco})},
+  journal = {Water},
+  year    = {2020},
+  volume  = {12},
+  number  = {2},
+  pages   = {471},
+  doi     = {10.3390/w12020471}
+}
+
+@article{pande2021ahpmif,
+  author  = {Pande, Chaitanya B. and Moharir, Kanak N. and Panneerselvam, Balamurugan and others},
+  title   = {Delineation of groundwater potential zones for sustainable development and planning using analytical hierarchy process ({AHP}), and {MIF} techniques},
+  journal = {Applied Water Science},
+  year    = {2021},
+  volume  = {11},
+  pages   = {186},
+  doi     = {10.1007/s13201-021-01522-1}
+}
+
+@article{mahala2019morphometric,
+  author  = {Mahala, Avijit},
+  title   = {The significance of morphometric analysis to understand the hydrological and morphological characteristics in two different morpho-climatic settings},
+  journal = {Applied Water Science},
+  year    = {2019},
+  volume  = {9},
+  pages   = {304},
+  doi     = {10.1007/s13201-019-1118-2}
+}
+
+@article{kumar2018morphometric,
+  author  = {Kumar, Praveen and Chandel, Rajeev Singh and Mishra, Varun Narayan and others},
+  title   = {Hydrological inferences through morphometric analysis of lower {Kosi} river basin of {India} for water resource management based on remote sensing data},
+  journal = {Applied Water Science},
+  year    = {2018},
+  volume  = {8},
+  pages   = {206},
+  doi     = {10.1007/s13201-018-0660-7}
+}
+
+% ── ML in Hydrology — review papers ──────────────────────────
+@article{sit2020deeplearning,
+  author  = {Sit, Muhammed and Demiray, Bekir Zahit and Xiang, Zhongrun and others},
+  title   = {A comprehensive review of deep learning applications in hydrology and water resources},
+  journal = {Water Science and Technology},
+  year    = {2020},
+  volume  = {82},
+  number  = {12},
+  pages   = {2635--2670},
+  doi     = {10.2166/wst.2020.369}
+}
+
+@article{hai2022gwlreview,
+  author  = {Hai, Tao and Hameed, Mohammed Majeed and Marhoon, Haydar Abdulameer and others},
+  title   = {Groundwater level prediction using machine learning models: A comprehensive review},
+  journal = {Neurocomputing},
+  year    = {2022},
+  volume  = {489},
+  pages   = {271--308},
+  doi     = {10.1016/j.neucom.2022.03.014}
+}
+
+@article{zhu2022mlwaterquality,
+  author  = {Zhu, Mengyuan and Wang, Jiawei and Yang, Xiao and others},
+  title   = {A review of the application of machine learning in water quality evaluation},
+  journal = {Eco-Environment \& Health},
+  year    = {2022},
+  volume  = {1},
+  number  = {2},
+  pages   = {107--116},
+  doi     = {10.1016/j.eehl.2022.06.001}
+}
+
+% ── Methodology analogues (ensemble / susceptibility ML) ─────
+@article{sahin2020ensembletree,
+  author  = {Sahin, Emrehan Kutlug},
+  title   = {Assessing the predictive capability of ensemble tree methods for landslide susceptibility mapping using {XGBoost}, gradient boosting machine, and random forest},
+  journal = {SN Applied Sciences},
+  year    = {2020},
+  volume  = {2},
+  pages   = {1308},
+  doi     = {10.1007/s42452-020-3060-1}
+}
+
+@article{chang2019scaleeffects,
+  author  = {Chang, Kuan-Tsung and Merghadi, Abdelaziz and Yunus, Ali P. and others},
+  title   = {Evaluating scale effects of topographic variables in landslide susceptibility models using {GIS}-based machine learning techniques},
+  journal = {Scientific Reports},
+  year    = {2019},
+  volume  = {9},
+  pages   = {12296},
+  doi     = {10.1038/s41598-019-48773-2}
+}
+
+@article{wu2019adaboost,
+  author  = {Wu, Yanli and Ke, Yutian and Chen, Zhuo and others},
+  title   = {Application of alternating decision tree with {AdaBoost} and bagging ensembles for landslide susceptibility mapping},
+  journal = {CATENA},
+  year    = {2019},
+  volume  = {187},
+  pages   = {104396},
+  doi     = {10.1016/j.catena.2019.104396}
+}
+
+@article{roy2019knowledgedriven,
+  author  = {Roy, Jagabandhu and Saha, Sunil},
+  title   = {Landslide susceptibility mapping using knowledge driven statistical models in {Darjeeling} District, {West Bengal, India}},
+  journal = {Geoenvironmental Disasters},
+  year    = {2019},
+  volume  = {6},
+  pages   = {11},
+  doi     = {10.1186/s40677-019-0126-8}
+}
+
+@article{nguyen2021datasplitting,
+  author  = {Nguyen, Quang Hung and Ly, Hai-Bang and Ho, Lanh Si and others},
+  title   = {Influence of Data Splitting on Performance of Machine Learning Models in Prediction of Shear Strength of Soil},
+  journal = {Mathematical Problems in Engineering},
+  year    = {2021},
+  volume  = {2021},
+  pages   = {4832864},
+  doi     = {10.1155/2021/4832864}
+}
+
+@article{swain2020floodahp,
+  author  = {Swain, Kishore Chandra and Singha, Chiranjit and Nayak, Laxmikanta},
+  title   = {Flood Susceptibility Mapping through the {GIS-AHP} Technique Using the Cloud},
+  journal = {ISPRS International Journal of Geo-Information},
+  year    = {2020},
+  volume  = {9},
+  number  = {12},
+  pages   = {720},
+  doi     = {10.3390/ijgi9120720}
+}
+
+% ── Data sources ─────────────────────────────────────────────
+@article{poggio2021soilgrids,
+  author  = {Poggio, Laura and de Sousa, Luis M. and Batjes, Niels H. and others},
+  title   = {{SoilGrids} 2.0: producing soil information for the globe with quantified spatial uncertainty},
+  journal = {SOIL},
+  year    = {2021},
+  volume  = {7},
+  pages   = {217--240},
+  doi     = {10.5194/soil-7-217-2021}
+}
+
+@article{wulder2019landsat,
+  author  = {Wulder, Michael A. and Loveland, Thomas R. and Roy, David P. and others},
+  title   = {Current status of {Landsat} program, science, and applications},
+  journal = {Remote Sensing of Environment},
+  year    = {2019},
+  volume  = {225},
+  pages   = {127--147},
+  doi     = {10.1016/j.rse.2019.02.015}
+}
+
+% ── Global GW context ────────────────────────────────────────
+@article{jasechko2024gwdecline,
+  author  = {Jasechko, Scott and Seybold, Hansj{\"o}rg and Perrone, Debra and others},
+  title   = {Rapid groundwater decline and some cases of recovery in aquifers globally},
+  journal = {Nature},
+  year    = {2024},
+  volume  = {625},
+  pages   = {715--721},
+  doi     = {10.1038/s41586-023-06879-8}
+}
+
+% ── Pakistan / Pothohar / Punjab regional studies ────────────
+@article{asif2023lulc,
+  author  = {Asif, Muhammad and Kazmi, Jamil Hasan and Tariq, Aqil and others},
+  title   = {Modelling of land use and land cover changes and prediction using {CA-Markov} and Random Forest},
+  journal = {Geocarto International},
+  year    = {2023},
+  volume  = {38},
+  number  = {1},
+  pages   = {2210532},
+  doi     = {10.1080/10106049.2023.2210532}
+}
+
+@article{waseem2022drought,
+  author  = {Waseem, Muhammad and Jaffry, Ali Hasan and Azam, Muhammad and others},
+  title   = {Spatiotemporal Analysis of Drought and Agriculture Standardized Residual Yield Series Nexuses across {Punjab, Pakistan}},
+  journal = {Water},
+  year    = {2022},
+  volume  = {14},
+  number  = {3},
+  pages   = {496},
+  doi     = {10.3390/w14030496}
+}
+
+@article{sarwar2022soandrought,
+  author  = {Sarwar, Awais Naeem and Waseem, Muhammad and Azam, Muhammad and others},
+  title   = {Shifting of Meteorological to Hydrological Drought Risk at Regional Scale},
+  journal = {Applied Sciences},
+  year    = {2022},
+  volume  = {12},
+  number  = {11},
+  pages   = {5560},
+  doi     = {10.3390/app12115560}
+}
+
+@article{ahmed2021indusbasin,
+  author  = {Ahmed, Naveed and Lu, Haishen and Ahmed, Shakeel and others},
+  title   = {Irrigation Supply and Demand, Land Use/Cover Change and Future Projections of Climate, in {Indus} Basin Irrigation System, {Pakistan}},
+  journal = {Sustainability},
+  year    = {2021},
+  volume  = {13},
+  number  = {16},
+  pages   = {8695},
+  doi     = {10.3390/su13168695}
+}
+
+@article{khan2023rainfallrunoff,
+  author  = {Khan, Muhammad Tariq and Shoaib, Muhammad and Albano, Raffaele and others},
+  title   = {Intercomparison and Assessment of Stand-Alone and Wavelet-Coupled Machine Learning Models for Simulating Rainfall-Runoff Process in Four Basins of {Pothohar} Region, {Pakistan}},
+  journal = {Atmosphere},
+  year    = {2023},
+  volume  = {14},
+  number  = {3},
+  pages   = {452},
+  doi     = {10.3390/atmos14030452}
+}
+
+@article{hafeez2025rwh,
+  author  = {Hafeez, Muhammad and Cheema, Muhammad Jehanzeb Masud and Liaqat, Umar Waqas and others},
+  title   = {Mapping of potential storages and rainwater harvesting sites in arid region of {Indus} basin using analytical hierarchy technique},
+  journal = {Scientific Reports},
+  year    = {2025},
+  volume  = {15},
+  pages   = {36947},
+  doi     = {10.1038/s41598-025-20915-9}
+}
+
+@article{waseem2024waterquality,
+  author  = {Waseem, Kashaf and Akhtar, Abdul Saboor and Nawaz, Ahsan and others},
+  title   = {Water quality assessment and trends in twin cities of {Pakistan}: a review},
+  journal = {Discover Water},
+  year    = {2024},
+  volume  = {4},
+  pages   = {25},
+  doi     = {10.1007/s43832-024-00182-x}
+}
+
+@article{ejaz2023soilwater,
+  author  = {Ejaz, Raza and Chaudhary, Khalid Mahmood and Ashraf, Ijaz and others},
+  title   = {Analysis of Constraining Factors Regarding Adoption of Soil and Water Conservation Practices in the {Pothohar, Punjab}},
+  journal = {Journal of Agricultural Research},
+  year    = {2023},
+  volume  = {61},
+  number  = {2},
+  pages   = {163--170},
+  doi     = {10.58475/2023.61.2.1944}
+}
+
+@article{khan2024afforestation,
+  author  = {Khan, Shehryar and Malik, Sabeeqa Usman and Gulzar, Saeed and others},
+  title   = {Evaluating potential of dry afforestation techniques on barren land in {Attock}},
+  journal = {Zoo Botanica},
+  year    = {2024},
+  volume  = {2},
+  number  = {2},
+  doi     = {10.55627/zoobotanica.002.02.0602}
+}
+
+@article{kamran2024watersecurity,
+  author  = {Kamran and Khayyam, Umer and Safdar, Fasiha and others},
+  title   = {Assessing the impact of socio-demographic factors on municipal water security in planned and unplanned urban centers of {Pakistan}},
+  journal = {AQUA -- Water Infrastructure, Ecosystems and Society},
+  year    = {2024},
+  volume  = {73},
+  number  = {9},
+  pages   = {1820--1838},
+  doi     = {10.2166/aqua.2024.118}
+}

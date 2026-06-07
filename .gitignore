@@ -1,0 +1,37 @@
+# PDFs
+*.pdf
+
+# LaTeX build artifacts
+*.aux
+*.bbl
+*.blg
+*.fdb_latexmk
+*.fls
+*.lof
+*.log
+*.lot
+*.out
+*.synctex.gz
+*.toc
+*.xdv
+
+# Compiled output
+main.pdf
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.venv/
+venv/
+*.egg-info/
+
+# Local Claude/MCP configuration (contains machine-specific paths)
+.claude/
+.mcp.json
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini

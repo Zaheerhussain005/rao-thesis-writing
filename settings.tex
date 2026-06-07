@@ -1,0 +1,83 @@
+% ============================================================
+%  settings.tex  —  Global formatting, packages, and macros
+%  ML-Based Groundwater Potential Mapping — Pothohar Plateau
+%  Engine: XeLaTeX + BibTeX (IEEEtran)   |   Overleaf-ready
+% ============================================================
+
+% ---- Page geometry (A4, bound-thesis margins) --------------
+\usepackage[a4paper,left=1.5in,right=1in,top=1in,bottom=1in]{geometry}
+
+% ---- Fonts (XeLaTeX / fontspec) ----------------------------
+\usepackage{fontspec}
+% TeX Gyre Termes is a Times-compatible font bundled with TeX Live /
+% Overleaf, so it compiles anywhere. Swap to "Times New Roman" if your
+% institution requires the exact font and it is installed.
+\setmainfont{TeX Gyre Termes}
+\usepackage{microtype}
+
+% ---- Line spacing ------------------------------------------
+\usepackage{setspace}
+\onehalfspacing                   % 1.5 line spacing (thesis standard)
+
+% ---- Math & units ------------------------------------------
+\usepackage{amsmath,amssymb}
+\usepackage{unicode-math}         % math fonts under XeLaTeX
+\setmathfont{TeX Gyre Termes Math}
+\usepackage{siunitx}              % \SI{25000}{\kilo\meter\squared}
+\sisetup{per-mode=symbol,detect-weight=true}
+
+% ---- Tables ------------------------------------------------
+\usepackage{booktabs}            % \toprule \midrule \bottomrule
+\usepackage{multirow}
+\usepackage{array}
+\usepackage{longtable}
+
+% ---- Figures -----------------------------------------------
+\usepackage{graphicx}
+\graphicspath{{figures/}}        % all 52 figures resolve by bare name
+\usepackage{float}               % [H] exact float placement
+\usepackage{caption}
+\usepackage{subcaption}
+\captionsetup{font=small,labelfont=bf,justification=centering}
+
+% ---- Colour ------------------------------------------------
+\usepackage[dvipsnames,table]{xcolor}
+
+% ---- Bibliography: IEEE numeric [1],[2] --------------------
+\usepackage[numbers,square,sort&compress]{natbib}
+\bibliographystyle{IEEEtran}
+
+% ---- Hyperlinks (load late) --------------------------------
+\usepackage[hidelinks,breaklinks=true]{hyperref}
+\hypersetup{
+  colorlinks=true,
+  linkcolor=black,
+  citecolor=NavyBlue,
+  urlcolor=NavyBlue,
+  pdftitle={ML-Based Groundwater Potential Mapping of the Pothohar Plateau},
+  pdfauthor={M.Sc. Thesis, NUST MISIS}
+}
+
+% ---- Headers / footers -------------------------------------
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhf{}
+\renewcommand{\headrulewidth}{0.4pt}
+\fancyhead[L]{\nouppercase{\leftmark}}
+\fancyhead[R]{\thepage}
+\fancypagestyle{plain}{\fancyhf{}\fancyfoot[C]{\thepage}\renewcommand{\headrulewidth}{0pt}}
+
+% ---- Chapter title styling ---------------------------------
+\usepackage{titlesec}
+\titleformat{\chapter}[display]
+  {\normalfont\huge\bfseries}
+  {\chaptertitlename\ \thechapter}{12pt}{\Huge}
+\titlespacing*{\chapter}{0pt}{0pt}{24pt}
+
+% ---- Lists -------------------------------------------------
+\usepackage{enumitem}
+\setlist{itemsep=2pt,topsep=3pt}
+
+% ---- Convenience macros ------------------------------------
+\newcommand{\studyarea}{Pothohar Plateau}
+\newcommand{\npixels}{37{,}015{,}091}

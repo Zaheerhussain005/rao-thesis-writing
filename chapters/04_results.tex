@@ -1,0 +1,385 @@
+% ============================================================
+%  Chapter 4 — Results
+% ============================================================
+\chapter{Results}
+\label{ch:results}
+
+This chapter reports the outcomes of the analysis in the order the methodology
+introduced them: the exploratory structure of the feature data, the comparative
+performance of the four classifiers, the factors the best model relied on, the
+resulting groundwater potential map, and finally the spatial-realism validation
+that tests the map against independent evidence.
+
+\section{Exploratory Data Analysis}
+\label{sec:eda}
+
+Before any model was trained, the relationship between each feature and the
+groundwater potential label was examined across all \npixels{} valid pixels. The
+nine features contained no missing values within the study-area mask and each
+spanned the full normalized range, so no pixels were lost to incomplete data.
+
+The Pearson correlations (Figure~\ref{fig:correlation}) are informative in their
+own right. Soil texture stands out, correlating with the potential label at
+$r = 0.836$---far stronger than any other feature---followed by cumulative
+rainfall at $r = 0.514$. Land surface temperature is the strongest of the
+negatively associated features ($r = -0.426$), consistent with its role as a
+proxy for evaporative loss. NDVI ($+0.240$), elevation ($+0.234$), NDWI
+($-0.222$), and TWI ($+0.185$) form a middle group, while aspect ($+0.060$) and
+slope ($+0.051$) are effectively uncorrelated. The negligible slope correlation
+is itself a regional finding rather than a defect: across a comparatively
+subdued plateau, slope simply does not discriminate groundwater zones the way it
+would in mountainous terrain.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.8\textwidth]{correlation_matrix}
+  \caption{Pearson correlation matrix of the nine input features and the
+           groundwater potential label. Soil texture ($r=0.836$) and rainfall
+           ($r=0.514$) are the dominant positively correlated predictors.}
+  \label{fig:correlation}
+\end{figure}
+
+The dominance of soil and rainfall is consistent with the hydrogeology discussed
+in Chapter~\ref{ch:methodology} and with the wider literature: permeability
+controls whether water infiltrates, and rainfall supplies the water to begin
+with. It also echoes Khan et al. \cite{khan2023rainfallrunoff}, who found
+rainfall to be the principal driver of the hydrological response in these same
+basins. Figure~\ref{fig:feature_target} summarizes the per-feature association
+with the label in ranked form.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.75\textwidth]{feature_target_correlation}
+  \caption{Features ranked by absolute correlation with the groundwater potential
+           label, showing the clear lead of soil texture and rainfall.}
+  \label{fig:feature_target}
+\end{figure}
+
+By construction, the weighted-overlay labelling produced a class distribution of
+40\% Low, 40\% Medium, and 20\% High (Figure~\ref{fig:class_dist}). The balanced
+training sample drawn from these labels removed this imbalance for model fitting,
+as described in Section~\ref{sec:training_data}.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.7\textwidth]{class_distribution_pub}
+  \caption{Distribution of the three groundwater potential classes in the
+           weighted-overlay reference labels across the full plateau.}
+  \label{fig:class_dist}
+\end{figure}
+
+\section{Model Performance}
+\label{sec:model_performance}
+
+All four classifiers were trained on the 360,000-pixel training portion and
+evaluated on the held-out 90,000-pixel test set.
+Table~\ref{tab:model_results} reports the headline metrics.
+
+\begin{table}[H]
+\centering
+\caption{Performance of the four classifiers on the 90,000-pixel test set. Best
+         value in each column in bold.}
+\label{tab:model_results}
+\begin{tabular}{lcccc}
+\toprule
+Model & Accuracy (\%) & Macro $F_1$ & Cohen's $\kappa$ & ROC-AUC \\
+\midrule
+Random Forest      & 98.32 & 0.9832 & 0.9749 & 0.9995 \\
+\textbf{XGBoost}   & \textbf{99.12} & \textbf{0.9912} & \textbf{0.9868} & \textbf{0.9998} \\
+LightGBM           & 99.11 & 0.9911 & 0.9867 & 0.9998 \\
+Voting Ensemble    & 99.09 & 0.9909 & 0.9863 & 0.9998 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+XGBoost gave the best results on every metric, reaching 99.12\% accuracy, a macro
+$F_1$ of 0.9912, Cohen's $\kappa$ of 0.9868, and a one-vs-rest ROC-AUC of 0.9998,
+and it was selected as the model for full-plateau prediction. The margins between
+the top three models are slim---LightGBM trails by barely a hundredth of a
+percentage point, and the voting ensemble sits just behind both---while random
+forest is a clear, if still strong, step below at 98.32\%. This ordering, with
+XGBoost ahead of random forest and gradient boosting clustered at the top, mirrors
+the ranking Sahin \cite{sahin2020ensembletree} reported for the same model
+families in landslide susceptibility mapping, which lends some external
+credibility to the comparison even though the absolute numbers here are higher.
+Figure~\ref{fig:model_comparison} shows the comparison visually.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.85\textwidth]{model_comparison}
+  \caption{Comparison of the four classifiers across accuracy, macro $F_1$,
+           Cohen's $\kappa$, and ROC-AUC on the test set.}
+  \label{fig:model_comparison}
+\end{figure}
+
+The absolute accuracies---near 99\%---are far above the 0.73--0.86 AUC range
+typical of knowledge-driven AHP and frequency-ratio GWPM studies
+\cite{das2018pravara,pande2021ahpmif}. This gap should be read carefully rather
+than celebrated uncritically: it reflects in large part the fact that the models
+are learning to reproduce a deterministic weighted overlay built from the same
+features, a point developed in Section~\ref{sec:agreement} and again in
+Chapter~\ref{ch:discussion}. What the metrics establish is that the learning
+problem was solved cleanly; whether the resulting map is hydrogeologically
+trustworthy is a separate question, addressed by the validation in
+Section~\ref{sec:validation_results}.
+
+\subsection{Per-Class Performance}
+\label{sec:per_class}
+
+Because a high overall accuracy can still hide weakness on a minority class, the
+per-class behaviour of XGBoost was examined (Table~\ref{tab:per_class}). All
+three classes are predicted with precision and recall above 98\%. The High class,
+the one of greatest practical interest, is recovered with the highest recall of
+the three (99.61\%), meaning the model rarely misses genuinely high-potential
+ground in the test set; the slightly lower precision and recall on the Medium
+class reflect the expected difficulty of the middle category, whose boundaries
+with Low and High are the least sharp.
+
+\begin{table}[H]
+\centering
+\caption{Per-class precision, recall, and $F_1$ for the XGBoost model on the
+         test set.}
+\label{tab:per_class}
+\begin{tabular}{lccc}
+\toprule
+Class & Precision (\%) & Recall (\%) & $F_1$ (\%) \\
+\midrule
+Low    & 99.32 & 99.43 & 99.38 \\
+Medium & 99.04 & 98.32 & 98.68 \\
+High   & 98.99 & 99.61 & 99.31 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Class Separability}
+\label{sec:roc}
+
+The one-vs-rest ROC curves (Figure~\ref{fig:roc}) sit almost on the top-left
+corner for every class and model, corresponding to the AUC values near 0.9998 in
+Table~\ref{tab:model_results}. The precision--recall curves
+(Figure~\ref{fig:pr}) tell the same story from the complementary angle. While
+such near-perfect separability would be implausible for a map validated against
+field data, it is exactly what one expects when the target is a deterministic
+function of the inputs; the curves confirm that the models have recovered that
+function with very little residual confusion.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.78\textwidth]{roc_curves}
+  \caption{One-vs-rest ROC curves for the four classifiers on the test set. All
+           curves approach the ideal upper-left corner (AUC $\approx 0.9998$).}
+  \label{fig:roc}
+\end{figure}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.78\textwidth]{pr_curves}
+  \caption{Precision--recall curves for the three potential classes, confirming
+           high precision is maintained across the full recall range.}
+  \label{fig:pr}
+\end{figure}
+
+\subsection{Cross-Validation}
+\label{sec:cv}
+
+To confirm that the test-set performance was not an artefact of one particular
+split, each model was also assessed under five-fold cross-validation on the
+training data (Table~\ref{tab:cv}). The fold-to-fold variation is very small for
+all three tree ensembles---standard deviations of a few ten-thousandths in macro
+$F_1$---indicating stable, reproducible performance rather than a fortunate
+partition. LightGBM showed the tightest spread, XGBoost the best test-set
+metrics; in practice the two are interchangeable on this data, and either would
+serve as the production model.
+
+\begin{table}[H]
+\centering
+\caption{Five-fold cross-validated macro $F_1$ (mean $\pm$ standard deviation)
+         on the training set.}
+\label{tab:cv}
+\begin{tabular}{lc}
+\toprule
+Model & Macro $F_1$ (mean $\pm$ SD) \\
+\midrule
+Random Forest & $0.9839 \pm 0.0005$ \\
+XGBoost       & $0.9896 \pm 0.0004$ \\
+LightGBM      & $0.9911 \pm 0.0002$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.8\textwidth]{confusion_matrices}
+  \caption{Confusion matrices for the four classifiers on the test set. Almost
+           all mass lies on the diagonal; the few off-diagonal errors occur
+           between adjacent classes (Low--Medium and Medium--High).}
+  \label{fig:confusion}
+\end{figure}
+
+The confusion matrices (Figure~\ref{fig:confusion}) make the error structure
+explicit: what little misclassification occurs is confined to neighbouring
+classes, with essentially no Low pixels mistaken for High or vice versa. For an
+ordinal target this is the most benign error pattern possible.
+
+\section{Feature Importance}
+\label{sec:feature_importance}
+
+The features the models relied on agree closely with the exploratory correlations.
+For both random forest and XGBoost, soil texture was overwhelmingly the most
+important predictor, with an XGBoost importance of 0.831; rainfall ranked second
+(random forest importance 0.198, LightGBM 0.236). The remaining features carried
+modest weight, and LightGBM---consistent with its leaf-wise growth---spread
+importance somewhat more evenly than the other two models.
+Figure~\ref{fig:feature_importance} shows the comparison.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\textwidth]{feature_importance}
+  \caption{Feature importance across random forest, XGBoost, and LightGBM. Soil
+           texture dominates, with rainfall a consistent second.}
+  \label{fig:feature_importance}
+\end{figure}
+
+That a learned, nonlinear model independently arrives at the same two dominant
+factors as the correlation analysis---soil and rainfall---is reassuring. It also
+aligns with the reference study \cite{waqas2022chakwal}, in which geology and
+land use (the closest analogues to soil permeability) carried the largest
+weights, and it confirms that the model's behaviour is hydrogeologically
+sensible rather than being driven by spurious associations.
+
+\section{Groundwater Potential Map}
+\label{sec:prediction_map}
+
+Applying the XGBoost model to all \npixels{} valid pixels produced the
+full-resolution groundwater potential map in Figure~\ref{fig:gw_map}. The spatial
+distribution of the three classes is given in Table~\ref{tab:pixel_dist}.
+
+\begin{table}[H]
+\centering
+\caption{Predicted groundwater potential distribution across the \studyarea{}.}
+\label{tab:pixel_dist}
+\begin{tabular}{lcc}
+\toprule
+Zone & Pixel count & Coverage (\%) \\
+\midrule
+Low potential    & 14{,}806{,}035 & 40.0 \\
+Medium potential & 14{,}806{,}036 & 40.0 \\
+High potential   &  7{,}403{,}020 & 20.0 \\
+\midrule
+\textbf{Total}   & \textbf{\npixels{}} & \textbf{100.0} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\textwidth]{Fig1_GW_Prediction_Map}
+  \caption{Groundwater potential map of the \studyarea{} predicted by XGBoost at
+           30~m resolution. High-potential ground (green) concentrates along the
+           northern alluvial tracts and major river valleys; low-potential ground
+           (red) dominates the southern hard-rock terrain.}
+  \label{fig:gw_map}
+\end{figure}
+
+The map places high potential where hydrogeology would lead one to expect it:
+along the alluvial corridors of the Soan and the river valleys, and across the
+wetter northern districts, while the folded and crystalline terrain of the south
+and the Salt Range is predominantly Low. The continuous High-probability surface
+(Figure~\ref{fig:gw_prob}) conveys the same pattern with its gradations intact,
+and is the layer used for the validation in Section~\ref{sec:validation_results}.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\textwidth]{Fig2_GW_Probability_Map}
+  \caption{Continuous probability of the High potential class from the XGBoost
+           model, preserving the gradational detail lost in the hard
+           classification.}
+  \label{fig:gw_prob}
+\end{figure}
+
+\subsection{Agreement with the Weighted Overlay}
+\label{sec:agreement}
+
+Compared pixel by pixel against the weighted-overlay reference labels across all
+37~million valid pixels, the XGBoost map agrees on 99.05\% of them
+(Figure~\ref{fig:overlay_compare}). This high agreement is the expected
+consequence of training on those labels, and it should be interpreted as evidence
+that the model faithfully learned the overlay---not as an independent measure of
+correctness. The small disagreements are concentrated, as one would expect, along
+the class boundaries where the continuous score crosses a percentile threshold.
+Establishing whether the map is correct in a stronger sense requires evidence
+external to the labels, which the next section provides.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\textwidth]{Fig4_Overlay_vs_ML_Comparison}
+  \caption{Side-by-side comparison of the weighted-overlay reference labels and
+           the XGBoost prediction, which agree on 99.05\% of the 37~million
+           valid pixels.}
+  \label{fig:overlay_compare}
+\end{figure}
+
+\section{Spatial-Realism Validation}
+\label{sec:validation_results}
+
+The four independent checks defined in Section~\ref{sec:validation_design} were
+applied to the predicted map. Their combined results are shown in
+Figure~\ref{fig:spatial_realism} and described below.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\textwidth]{spatial_realism_validation}
+  \caption{Spatial-realism validation summary: (1) known alluvial sites against
+           predicted class; (2) recharge-zone discrimination from independent
+           rain-gauge stations; (3) cross-study consistency of the
+           High-potential fraction; and (4) the district-scale potential
+           gradient.}
+  \label{fig:spatial_realism}
+\end{figure}
+
+\paragraph{Known productive sites.}
+All four published groundwater sites in the Rawalpindi alluvial basin fell within
+Medium or High potential ground on the predicted map, with High-class
+probabilities at or close to one---a 100\% hit rate for locations independently
+known to be productive. The number of such sites is small, so this is a
+qualitative rather than statistical result, but it is the most direct available
+check and the map passes it cleanly.
+
+\paragraph{Recharge-zone discrimination.}
+The independent rain-gauge stations of Khan et al.
+\cite{khan2023rainfallrunoff}, split into alluvial and non-alluvial groups by
+hydrogeological setting, showed a clear separation in predicted potential. The
+alluvial stations had a markedly higher predicted High-probability than the
+non-alluvial ones, and a one-sided Mann--Whitney $U$ test confirmed the
+difference was statistically significant ($p = 0.023$). Because these stations
+played no part in training the model, this is genuine external evidence that the
+map distinguishes recharge-favourable from recharge-poor ground.
+
+\paragraph{Cross-study consistency.}
+The 20\% of the plateau classified as High potential is consistent in magnitude
+with independent AHP-based assessments of the same region. Hafeez et al.
+\cite{hafeez2025rwh}, mapping water-storage and rainwater-harvesting suitability
+across essentially the same districts, identified a minority of the area as most
+suitable, in the same broad range. Both approaches agree that high-potential
+ground is the exception rather than the rule across this semi-arid upland, which
+argues against the prediction being systematically over- or under-stated.
+
+\paragraph{District-scale gradient.}
+Ranking the five districts by their predicted fraction of High potential
+reproduces the expected hydrogeological order almost exactly. Rawalpindi, the
+wettest and most alluvial district, has the largest High fraction at about 61\%,
+descending through Attock and Jhelum to Mianwali and Chakwal at only 4--5\%. The
+Spearman rank correlation between predicted and expected ordering is
+$\rho = 1.00$, a perfect match. This gradient---wet, alluvial north against dry,
+hard-rock south---is the single most robust piece of validation evidence,
+because it rests on the relative ordering of large district populations rather
+than on a handful of points.
+
+\paragraph{Summary.}
+Taken together, the four checks point the same way: the map reproduces known
+productive ground, separates recharge zones that were never shown to the model,
+matches the magnitude of independent regional studies, and follows the expected
+district gradient perfectly. None of these tests depends on the weighted-overlay
+labels, so they address the credibility question that internal accuracy cannot.
+Their interpretation, and the limits of what they can establish, is the subject
+of Chapter~\ref{ch:discussion}.

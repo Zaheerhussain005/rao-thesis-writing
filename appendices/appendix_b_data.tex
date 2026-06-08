@@ -1,0 +1,112 @@
+% ============================================================
+%  Appendix B — Data Sources and Outputs
+% ============================================================
+\chapter{Data Sources and Outputs}
+\label{app:data}
+
+\section{Source Datasets}
+\label{app:sources}
+
+All input data were obtained through Google Earth Engine. Table~\ref{tab:gee_full}
+gives the full dataset identifiers, native resolutions, and the temporal windows
+used.
+
+\begin{table}[H]
+\centering
+\caption{Google Earth Engine source datasets for the nine input features.}
+\label{tab:gee_full}
+\small
+\begin{tabular}{p{2.3cm} p{5.4cm} p{2.2cm} p{2.6cm}}
+\toprule
+Feature & GEE dataset & Native res. & Period \\
+\midrule
+Elevation & \texttt{USGS/SRTMGL1\_003} & 30~m & 2000 \\
+Slope, Aspect & \texttt{ee.Terrain} (from SRTM) & 30~m & 2000 \\
+TWI & \texttt{WWF/HydroSHEDS/15ACC} + SRTM & 15~arc-sec & static \\
+NDVI, NDWI & \texttt{LANDSAT/LC08/C02/T1\_L2} & 30~m & 2015--2023 \\
+Rainfall & \texttt{UCSB-CHG/CHIRPS/DAILY} & 0.05$^\circ$ & 2015--2023 \\
+Soil texture & \texttt{OpenLandMap/SOL/SOL\_TEXTURE-CLASS\_USDA-TT\_M/v02} & 250~m & static \\
+LST & \texttt{MODIS/061/MOD11A1} & 1~km & 2015--2023 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+All bands were resampled to a common 30~m grid in EPSG:4326 on export, and
+reprojected to UTM Zone~42N (EPSG:32642) for area and distance calculations. The
+exported raster is $10{,}062 \times 6{,}884$ pixels (about 69.2~million cells), of
+which \npixels{} (53.4\%) lie within the five district boundaries and carry valid
+data.
+
+\section{Study Area Specification}
+\label{app:area}
+
+\begin{table}[H]
+\centering
+\caption{Study area parameters.}
+\label{tab:area_spec}
+\begin{tabular}{ll}
+\toprule
+Parameter & Value \\
+\midrule
+Districts & Chakwal, Rawalpindi, Attock, Jhelum, Mianwali \\
+Approx.\ area & \SI{25000}{\kilo\meter\squared} \\
+Latitude range & \ang{32.16}--\ang{34.02}~N \\
+Longitude range & \ang{71.11}--\ang{73.82}~E \\
+Export CRS & EPSG:4326 \\
+Analysis CRS & EPSG:32642 (UTM Zone 42N) \\
+Resolution & 30~m \\
+Valid pixels & \npixels{} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\section{Model Outputs}
+\label{app:outputs}
+
+The principal geospatial outputs of the study are listed in
+Table~\ref{tab:outputs}. The classified and probability rasters are the
+deliverables intended for downstream GIS use.
+
+\begin{table}[H]
+\centering
+\caption{Principal model outputs.}
+\label{tab:outputs}
+\small
+\begin{tabular}{p{5.2cm} p{8cm}}
+\toprule
+Output & Description \\
+\midrule
+\texttt{gw\_prediction\_xgboost.tif} & Classified groundwater potential (0 = Low, 1 = Medium, 2 = High), 30~m. \\
+\texttt{gw\_probability\_high.tif}   & Continuous probability of the High class, 30~m. \\
+\texttt{gw\_potential\_labels.tif}   & Weighted-overlay reference labels. \\
+\texttt{best\_model.joblib}          & Trained XGBoost model. \\
+\texttt{metrics.json}                & Full accuracy report and per-class metrics. \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\section{Predicted Distribution by District}
+\label{app:district}
+
+Table~\ref{tab:district_high} reports the share of each district classified as
+High potential, which forms the basis of the district-gradient validation in
+Section~\ref{sec:validation_results}. The ordering follows the expected
+hydrogeological gradient from the wetter, alluvial north to the drier, hard-rock
+south (Spearman $\rho = 1.00$).
+
+\begin{table}[H]
+\centering
+\caption{Predicted High-potential fraction by district.}
+\label{tab:district_high}
+\begin{tabular}{lc}
+\toprule
+District & High potential (\%) \\
+\midrule
+Rawalpindi & 61.3 \\
+Attock     & 32.5 \\
+Jhelum     & 20.8 \\
+Mianwali   & 5.4 \\
+Chakwal    & 4.0 \\
+\bottomrule
+\end{tabular}
+\end{table}

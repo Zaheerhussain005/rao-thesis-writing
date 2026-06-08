@@ -1,0 +1,93 @@
+% ============================================================
+%  Appendix A — Implementation and Code
+% ============================================================
+\chapter{Implementation and Code}
+\label{app:code}
+
+This appendix documents the software implementation of the analysis. The full
+pipeline was written in Python~3.13 and organized as a sequence of scripts, each
+corresponding to one stage of the workflow in Chapter~\ref{ch:methodology}.
+
+\section{Software Environment}
+\label{app:env}
+
+The principal libraries used were \texttt{earthengine-api} and \texttt{geemap}
+for data collection; \texttt{rasterio} and \texttt{geopandas} for geospatial
+preprocessing; \texttt{numpy} and \texttt{pandas} for array and table handling;
+and \texttt{scikit-learn}, \texttt{xgboost}, and \texttt{lightgbm} for model
+training and evaluation. Figures were produced with \texttt{matplotlib} and
+\texttt{contextily}.
+
+\section{Pipeline Scripts}
+\label{app:scripts}
+
+Table~\ref{tab:scripts} lists the scripts in execution order and the role of each.
+
+\begin{table}[H]
+\centering
+\caption{Pipeline scripts in execution order.}
+\label{tab:scripts}
+\small
+\begin{tabular}{p{4.4cm} p{8.6cm}}
+\toprule
+Script & Function \\
+\midrule
+\texttt{collect\_data.py}        & Assemble the nine features in Google Earth Engine and export the multi-band GeoTIFF. \\
+\texttt{preprocess.py}           & Mask to district boundaries, min--max normalize each band, quality-check. \\
+\texttt{step1\_generate\_labels.py} & Weighted-overlay scoring and percentile thresholding into three classes. \\
+\texttt{step2\_validate.py}      & Exploratory analysis: correlations, distributions, class balance. \\
+\texttt{step3\_train\_models.py} & Train and evaluate RF, XGBoost, LightGBM, and the voting ensemble; 5-fold CV. \\
+\texttt{step4\_predict\_map.py}  & Tiled full-plateau prediction; classified and probability rasters. \\
+\texttt{step9\_spatial\_realism\_validation.py} & The four spatial-realism checks and summary figure. \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\section{Representative Code}
+\label{app:snippets}
+
+The weighted-overlay score that produced the training labels
+(Equation~\ref{eq:overlay}) was implemented as a direct weighted sum of the
+normalized bands, with negatively-related features inverted before weighting:
+
+\begin{verbatim}
+# Weighted overlay: composite groundwater potential score
+weights = {
+    'soil': 0.25, 'twi': 0.20, 'rainfall': 0.20, 'ndvi': 0.10,
+    'slope': 0.10, 'ndwi': 0.05, 'elevation': 0.05, 'lst': 0.03,
+    'aspect': 0.02,
+}
+invert = {'slope', 'elevation', 'lst'}   # higher value -> lower potential
+
+score = np.zeros(n_pixels, dtype=np.float32)
+for name, w in weights.items():
+    f = bands[name]                      # normalized to [0, 1]
+    score += w * (1.0 - f if name in invert else f)
+
+# Percentile thresholds: 40% Low, 40% Medium, 20% High
+low_t, high_t = np.percentile(score, [40, 80])
+labels = np.where(score < low_t, 0, np.where(score < high_t, 1, 2))
+\end{verbatim}
+
+The XGBoost classifier was configured with the hyperparameters reported in
+Section~\ref{sec:ml_models}:
+
+\begin{verbatim}
+from xgboost import XGBClassifier
+
+model = XGBClassifier(
+    n_estimators=300,
+    learning_rate=0.1,
+    max_depth=6,
+    subsample=0.8,
+    colsample_bytree=0.8,
+    objective='multi:softprob',
+    num_class=3,
+    n_jobs=-1,
+)
+model.fit(X_train, y_train)
+\end{verbatim}
+
+Full-plateau prediction was carried out over $2048 \times 2048$ pixel tiles to
+keep memory use bounded, with each tile classified and written back to the output
+raster before the next was read.

@@ -1,0 +1,135 @@
+% ============================================================
+%  Chapter 6 — Conclusion
+% ============================================================
+\chapter{Conclusion and Future Work}
+\label{ch:conclusion}
+
+\section{Summary of the Study}
+\label{sec:concl_summary}
+
+This thesis set out to bring groundwater potential mapping of the \studyarea{}
+from a single district and a manual method up to the full five-district plateau
+and a machine-learning method. Nine geo-environmental features---elevation,
+slope, aspect, topographic wetness index, NDVI, NDWI, rainfall, soil texture, and
+land surface temperature---were assembled at 30~m resolution through Google Earth
+Engine for the whole of Chakwal, Rawalpindi, Attock, Jhelum, and Mianwali,
+yielding \npixels{} valid pixels. A knowledge-based weighted overlay supplied
+three-class reference labels, a balanced sample of 450,000 pixels was used to
+train four classifiers, and the best of these was applied across the plateau to
+produce a full-resolution map, which was then tested against independent evidence.
+The work thereby answers the four research questions posed in
+Chapter~\ref{ch:introduction}, as summarized below.
+
+\section{Key Findings}
+\label{sec:concl_findings}
+
+\begin{itemize}
+  \item \textbf{Reproducing and refining the overlay (RQ1).} A single XGBoost
+        model reproduced the knowledge-based weighted overlay across all
+        37~million pixels with 99.05\% agreement, confirming that supervised
+        learning can stand in for the manual method---while doing so in a form
+        that needs no fixed expert weights and yields a continuous probability
+        surface.
+
+  \item \textbf{Best model (RQ2).} Of the four classifiers, XGBoost performed best
+        on every metric (99.12\% accuracy, macro $F_1 = 0.991$, Cohen's
+        $\kappa = 0.987$, ROC-AUC $= 0.9998$), narrowly ahead of LightGBM and the
+        voting ensemble and a clear step above random forest. The differences
+        among the boosting models are small enough that any of them would serve in
+        practice.
+
+  \item \textbf{Controlling factors (RQ3).} Soil texture ($r = 0.836$; XGBoost
+        importance 0.831) and rainfall ($r = 0.514$) emerged as the dominant
+        predictors from both the correlation analysis and the trained models,
+        consistent with the hydrogeology of a semi-arid, recharge-limited plateau
+        and with the reference study's emphasis on permeability-related factors.
+
+  \item \textbf{Independent credibility (RQ4).} A spatial-realism validation, using
+        evidence that played no part in training, supported the map on all four
+        checks: known alluvial sites fell in Medium or High ground, independent
+        rain-gauge stations separated by hydrogeological setting at a significant
+        level ($p = 0.023$), the 20\% High fraction matched independent regional
+        AHP work, and the district-scale potential gradient reproduced the expected
+        north--south ordering exactly ($\rho = 1.00$).
+\end{itemize}
+
+Across the plateau the model classified 20\% of the area as High potential, 40\%
+as Medium, and 40\% as Low, with high potential concentrated along the Soan basin
+and the northern and riverine alluvial corridors.
+
+\section{Contributions}
+\label{sec:concl_contributions}
+
+The study delivers the first machine-learning groundwater potential map of the
+full \studyarea{} at 30~m resolution, expanding the feature set of the reference
+study from five layers to nine, providing a systematic comparison of four
+classifiers on a balanced dataset, and---perhaps most importantly for a
+data-scarce region---demonstrating a transparent, evidence-based way to validate
+such a map when field measurements are unavailable. The accompanying GeoTIFF
+outputs, both a hard classification and a continuous probability surface, are
+directly usable in the GIS workflows of regional water-resource agencies.
+
+\section{Limitations}
+\label{sec:concl_limitations}
+
+The findings should be read with the limitations set out in
+Chapter~\ref{ch:discussion}. Chief among them is label circularity: because the
+training labels were derived from the same features used as inputs, the high
+internal accuracy measures fidelity to the weighted overlay rather than to ground
+truth, and the map's real-world credibility rests on the spatial-realism
+validation rather than on its accuracy figures. The validation, though
+independent, is built on relatively few points and establishes large-scale
+realism rather than pixel-level correctness. The feature set omits subsurface
+lithology and lineaments---likely causing over-prediction in hard-rock terrain---
+as well as water-quality information, and its static layers describe an average
+rather than a time-varying condition.
+
+\section{Recommendations for Future Work}
+\label{sec:concl_future}
+
+Several extensions follow naturally and would strengthen the map in roughly this
+order of priority.
+
+\begin{enumerate}
+  \item \textbf{Add a lithological layer.} Digitizing geological and lineament
+        information from Geological Survey of Pakistan sheets and adding it as a
+        tenth feature is the single most valuable improvement. It would directly
+        address the expected over-prediction in the crystalline and folded terrain
+        of the Salt Range, Margalla Hills, and Kala Chitta Range, where structure
+        rather than surface condition governs groundwater \cite{benjmel2020morocco}.
+
+  \item \textbf{Incorporate field-measured well data.} Where borehole yield or
+        water-level records can be obtained---for example through the PCRWR
+        monitoring network---they would allow a true accuracy assessment to
+        complement, and eventually move beyond, the knowledge-based labels,
+        loosening the circularity that constrains the present interpretation.
+
+  \item \textbf{Add a water-quality dimension.} A contamination or salinity layer
+        would let the map distinguish high-potential ground that is fit for use
+        from high-potential ground that is not, a distinction that matters
+        particularly in the peri-urban Rawalpindi belt \cite{waseem2024waterquality}.
+
+  \item \textbf{Capture temporal dynamics.} Replacing the static rainfall and
+        spectral summaries with multi-temporal inputs would allow seasonal and
+        interannual variation in recharge to be represented, rather than a single
+        average condition.
+
+  \item \textbf{Deliver an interactive product.} Publishing the map as a web-based
+        GIS layer would put it directly in the hands of district planners and
+        farmers, turning a research output into a usable decision-support tool.
+\end{enumerate}
+
+\section{Concluding Remarks}
+\label{sec:concl_remarks}
+
+Groundwater will only become more central to the \studyarea{} as rainfall grows
+less reliable and demand continues to rise, a pressure visible across aquifers
+worldwide \cite{jasechko2024gwdecline}. Knowing where the resource is likely to be
+found is a precondition for managing it well. This thesis has shown that machine
+learning can take over the mapping task from manual weighted overlay across the
+whole plateau, at fine resolution, and---when its limitations are acknowledged
+rather than hidden---can be validated against independent hydrogeological evidence
+rather than internal accuracy alone. The result is not a final answer but a
+defensible and extensible foundation: a first regional, reproducible groundwater
+potential map for the \studyarea{}, and a clear path, beginning with the addition
+of subsurface geology, toward making it better.

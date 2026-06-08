@@ -9,11 +9,11 @@
 
 % ---- Fonts (XeLaTeX / fontspec) ----------------------------
 \usepackage{fontspec}
-% Default main font is Latin Modern (always available — no download), so
-% the document compiles on a fresh MiKTeX. To use a Times-style font for
-% final submission, install the "tex-gyre" package in the MiKTeX Console
-% then uncomment the line below:
-% \setmainfont{texgyretermes}[Extension=.otf,UprightFont=*-regular,BoldFont=*-bold,ItalicFont=*-italic,BoldItalicFont=*-bolditalic]
+% Times-style main font. TeX Gyre Termes ships with full TeX Live (Overleaf)
+% and with MiKTeX once the "tex-gyre" package is installed. If a build ever
+% fails with "font cannot be found", comment this line out to fall back to
+% the always-available Latin Modern default.
+\setmainfont{TeX Gyre Termes}
 \usepackage{microtype}
 
 % ---- Line spacing ------------------------------------------

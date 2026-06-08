@@ -1,0 +1,233 @@
+% ============================================================
+%  Chapter 5 — Discussion
+% ============================================================
+\chapter{Discussion}
+\label{ch:discussion}
+
+The results of Chapter~\ref{ch:results} raise two distinct questions that are
+easily conflated. The first is technical: did the machine-learning models do
+what they were asked to do? The second is substantive: is the resulting
+groundwater potential map actually useful and correct? Keeping these apart is
+essential to an honest reading of this work, and the discussion below is
+organized around that distinction---beginning with model behaviour and feature
+interpretation, then confronting the label-circularity problem directly, and
+finally drawing out what the validation can and cannot establish, how the map
+compares with regional studies, where it is likely to be wrong, and what it is
+good for.
+
+\section{Model Performance in Context}
+\label{sec:discuss_performance}
+
+XGBoost achieved the best results across every metric, though only narrowly ahead
+of LightGBM and the voting ensemble. The closeness of the three boosting-based
+models is itself informative: when several well-regularized learners converge on
+almost identical performance, it usually means they have extracted essentially
+all of the available signal, and the remaining differences reflect minor
+implementation details rather than any deep advantage. XGBoost's slight edge is
+consistent with its regularized objective and column subsampling
+\cite{chen2016xgboost}, which tend to help on moderate-dimensional inputs like the
+nine-feature stack used here. The ordering---XGBoost first, random forest a clear
+step behind---also matches what Sahin \cite{sahin2020ensembletree} found when
+comparing the same families for landslide susceptibility, where boosting
+outperformed bagging on structurally similar spatial data. That an independent
+study on a different hazard reproduces the same ranking gives some confidence that
+the result reflects a real property of the methods rather than a quirk of this
+dataset.
+
+The absolute numbers, however, demand caution rather than celebration. An accuracy
+near 99\% and an AUC of 0.9998 would be extraordinary for a model validated
+against field observations; here they are unsurprising, because the target is a
+deterministic function of the input features. The next section takes this point
+head-on, since it governs how every performance figure in this thesis should be
+read.
+
+\section{Feature Importance and Hydrogeology}
+\label{sec:discuss_features}
+
+Both the correlation analysis and the trained models identify soil texture and
+rainfall as the two controlling factors, and the agreement between a simple linear
+diagnostic and a nonlinear ensemble is reassuring. Soil texture's dominance
+(XGBoost importance 0.831; $r = 0.836$) is hydrogeologically sensible: texture is
+the surface expression of permeability, and permeability decides whether rainfall
+infiltrates to recharge an aquifer or runs off. This is also consistent with the
+reference study \cite{waqas2022chakwal}, in which geology and land use---the
+nearest proxies for subsurface permeability---together carried the largest weight,
+and it lends after-the-fact support to the decision to source soil texture from
+SoilGrids \cite{poggio2021soilgrids} rather than omit it as the reference study
+effectively did.
+
+Rainfall's second place is equally expected in a monsoon-fed, recharge-limited
+setting, and it echoes Khan et al. \cite{khan2023rainfallrunoff}, who found
+rainfall to be the dominant control on the hydrological response of these same
+basins. The near-zero importance of slope ($r = 0.051$) deserves a brief comment
+because it might seem to contradict the GWPM literature, where slope is usually a
+meaningful factor. The explanation is regional: across a comparatively subdued
+plateau, slope varies too little to separate groundwater zones, whereas in the
+mountainous catchments where slope is informative the relief is far greater. The
+finding is therefore specific to this terrain and should not be generalized.
+
+\section{The Label-Circularity Problem}
+\label{sec:discuss_circularity}
+
+The central methodological issue in this work is that the training labels were
+generated from the same nine features that the models take as input. The
+weighted overlay computes a score from the features, thresholds it into three
+classes, and those classes become the targets the models learn to predict. The
+consequence is a form of circularity: the models are, in effect, learning to
+reproduce a fixed arithmetic combination of their own inputs. The 99.05\%
+agreement between the XGBoost map and the overlay labels
+(Section~\ref{sec:agreement}), and the near-perfect test metrics, are therefore
+largely a measure of how completely the model recovered that combination---not
+independent evidence that the map matches real groundwater.
+
+It would be dishonest to present the high accuracy as though it validated the map
+against reality, and this thesis does not. What the accuracy does establish is
+worth stating precisely, because it is not nothing. It shows that a single learned
+model can reproduce the weighted overlay across 37~million pixels faithfully and
+efficiently, which means the overlay can be replaced by a model that, unlike the
+overlay, does not require fixed expert weights, can represent nonlinear
+interactions among features, and yields a continuous probability surface rather
+than a hard class. In other words, the contribution of the ML step is not a more
+accurate map than the overlay---by construction it is almost the same map---but a
+more flexible, reproducible, and extensible way of producing it. This is the same
+logic under which knowledge-driven labels have been used to train spatial models
+elsewhere; Roy and Saha \cite{roy2019knowledgedriven}, for instance, trained on
+expert-weighted targets and treated the exercise as legitimate precisely because
+the weighted product encodes real domain knowledge.
+
+The honest conclusion is that internal accuracy cannot certify the map, and a
+different kind of evidence is needed. That is the purpose of the spatial-realism
+validation, discussed next.
+
+\section{What the Validation Establishes---and What It Does Not}
+\label{sec:discuss_validation}
+
+The four checks in Section~\ref{sec:validation_results} were designed to test the
+map against evidence that played no part in its construction, and on their own
+terms they are encouraging. The map places all four known alluvial sites in
+Medium or High ground; it separates independent rain-gauge stations by
+hydrogeological setting at a statistically significant level (Mann--Whitney
+$p = 0.023$); its 20\% High fraction matches the magnitude of an independent
+regional AHP study; and it reproduces the expected district gradient perfectly
+(Spearman $\rho = 1.00$). Crucially, none of these uses the overlay labels, so
+together they speak to the substantive question that internal accuracy cannot.
+
+Their limits should be stated just as plainly. The known-sites check rests on only
+four points and is qualitative. The rain-gauge test, though significant, is based
+on a modest number of stations. The cross-study comparison establishes consistency
+of magnitude, not agreement pixel by pixel. And the district gradient, while the
+strongest of the four because it aggregates large populations, confirms only that
+the broad north--south ordering is right, not that any particular hectare is
+correctly classified. What the validation supports, then, is a measured claim: the
+map is spatially realistic---it is right in its large-scale structure and on the
+independent points available---rather than a claim that it is accurate everywhere.
+For a data-scarce region this is, realistically, the strongest validation the
+available evidence will bear, and it is a more honest position than leaning on the
+99\% figure. The recurring difficulty of obtaining adequate ground truth for
+groundwater models is itself well documented \cite{hai2022gwlreview}; this thesis
+does not escape it, but it does try to be candid about it.
+
+\section{Comparison with the Reference and Regional Studies}
+\label{sec:discuss_comparison}
+
+Set against the reference study of Waqas et al. \cite{waqas2022chakwal}, the
+advance here is one of scope and method rather than of validated accuracy
+(Table~\ref{tab:comparison}). The present work covers all five districts of the
+plateau instead of one, uses nine features instead of five, replaces manual
+overlay with a learned model, and reports quantitative performance and an
+independent validation where the reference study reported neither. These are real
+improvements in reproducibility and coverage, and they are the substantive
+contribution; the headline accuracy, as discussed, is not directly comparable
+because the reference study did not train on its own overlay.
+
+\begin{table}[H]
+\centering
+\caption{Comparison of this thesis with the reference study of Waqas et al.
+         \cite{waqas2022chakwal}.}
+\label{tab:comparison}
+\small
+\begin{tabular}{lll}
+\toprule
+Aspect & Waqas et al.\ (2022) & This thesis \\
+\midrule
+Study area & Chakwal (1 district) & Full plateau (5 districts) \\
+Method     & Manual weighted overlay & ML (RF, XGBoost, LightGBM, ensemble) \\
+Features   & 5 & 9 \\
+Validation & Secondary data only & 5-fold CV + spatial-realism checks \\
+Output     & Static maps & GeoTIFF class + probability rasters \\
+Resolution & Not specified & 30~m \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The map also sits comfortably alongside other recent work on the region. Hafeez et
+al. \cite{hafeez2025rwh}, mapping rainwater-harvesting suitability across
+essentially the same districts by AHP, identify a similar minority of the area as
+most favourable and locate it in the same alluvial tracts, which is the
+cross-study consistency reported in Section~\ref{sec:validation_results}. The
+broader move from knowledge-driven overlay to data-driven prediction that this
+thesis carries out for groundwater has already been found beneficial for related
+problems---Arabameri et al. \cite{arabameri2018shahroud}, comparing approaches on
+a single plain, reported data-driven methods matching or exceeding multi-criteria
+ones---so the methodological direction taken here is well supported even if the
+circularity caveat tempers the accuracy gain.
+
+\section{Likely Errors: Hard-Rock Terrain and the Missing Lithology Layer}
+\label{sec:discuss_hardrock}
+
+The clearest weakness of the map is expected to lie in the hard-rock uplands. The
+nine features capture surface and climatic conditions well, but they say nothing
+direct about subsurface lithology or fracturing, and in crystalline or massively
+bedded terrain these are precisely the controls that matter. Benjmel et al.
+\cite{benjmel2020morocco} showed that in such settings lineament density and
+geological structure dominate groundwater occurrence, with fracture zones acting
+as conduits through otherwise impermeable rock. Where parts of the Margalla Hills
+or the Kala Chitta Range carry high rainfall and dense vegetation, the model is
+liable to read those surface signals as high potential even though the underlying
+rock may store little water. The absence of a lithological or lineament layer is
+thus the most probable source of systematic over-prediction, and adding a
+digitized geological map---from Geological Survey of Pakistan sheets---as a tenth
+feature is the single most valuable improvement available to future work.
+
+A second, subtler caveat concerns the distinction between potential and
+potability. The model predicts where groundwater is likely to occur, not whether
+it is fit to use. In the peri-urban Rawalpindi--Islamabad belt, shallow aquifers
+carry a documented contamination risk \cite{waseem2024waterquality}, so a
+high-potential classification there should be read as "water is likely present,"
+not "water is safe to drink." A water-quality layer would be needed to bridge that
+gap.
+
+\section{Practical Implications}
+\label{sec:discuss_implications}
+
+With those caveats in mind, the map still carries practical value for an area
+where groundwater siting is currently done with little spatial guidance. The High
+potential zone---about 20\% of the plateau, on the order of a few thousand square
+kilometres---is concentrated along the Soan basin and the northern and riverine
+alluvial corridors, and these are the natural first places to consider for new
+wells or managed recharge. The Low zone, dominating the southern hard-rock
+terrain, flags where deep borehole investment is least likely to pay off, subject
+to the lithology caveat above. Because the outputs are standard GeoTIFF rasters at
+30~m resolution---both a hard classification and a continuous probability
+surface---they can be brought directly into the GIS workflows of agencies such as
+PCRWR and the provincial irrigation department for district-level planning. In a
+region where rain-fed agriculture leaves households acutely dependent on
+groundwater through the dry season \cite{sarwar2022soandrought}, even a
+spatially-realistic first-order map is more useful than none.
+
+\section{Limitations}
+\label{sec:discuss_limitations}
+
+Several limitations have been noted in passing and are collected here for clarity.
+The foremost is label circularity: with no plateau-wide field measurements, the
+models were trained on knowledge-based labels, so internal accuracy measures
+fidelity to the overlay rather than to ground truth. The validation, while
+independent, rests on relatively few points and establishes spatial realism rather
+than pixel-level accuracy. The feature set omits subsurface lithology and
+lineaments, which likely causes over-prediction in hard-rock zones, and it
+includes no water-quality information. Finally, the static input layers---a
+multi-year rainfall sum, single-period spectral indices---describe an average
+condition and do not capture seasonal or interannual variation in groundwater.
+None of these undermines the central contribution, but each marks a place where
+the map should be used with appropriate caution and where future work can
+strengthen it.

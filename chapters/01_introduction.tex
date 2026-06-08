@@ -1,0 +1,279 @@
+% ============================================================
+%  Chapter 1 — Introduction
+% ============================================================
+\chapter{Introduction}
+\label{ch:introduction}
+
+\section{Background}
+\label{sec:background}
+
+Groundwater is the quiet backbone of water supply across much of the world.
+It irrigates fields when rain fails, fills wells when rivers run low, and in
+many semi-arid regions it is simply the only reliable source of fresh water.
+That dependence has grown faster than the resource can replenish itself. A
+recent global assessment of more than 1,600 aquifer systems found that water
+tables are falling in most of them, and in many cases the decline has
+accelerated since the start of this century \cite{jasechko2024gwdecline}. The
+problem is rarely one of total scarcity. It is one of \emph{knowing where the
+water is}---which parts of a landscape store and transmit groundwater, and
+which do not---so that extraction can be planned rather than guessed.
+
+Pakistan sits near the sharp end of this problem. The country supports a large
+agrarian population on a finite and increasingly stressed water budget, and
+the Indus Basin irrigation system that feeds the plains is already operating
+under growing demand and a shifting climate \cite{ahmed2021indusbasin}.
+Across Punjab, repeated meteorological droughts have begun to translate into
+hydrological droughts, with measurable effects on agricultural yield
+\cite{waseem2022drought,sarwar2022soandrought}. Urban water security is no
+more comfortable: rapid, often unplanned growth in the cities of the north has
+pushed municipal supply systems past their design limits
+\cite{kamran2024watersecurity}. In this setting groundwater is not a backup.
+It is the resource that keeps farms and households running between rains.
+
+Few parts of Punjab feel this more acutely than the \studyarea{}. The plateau
+is a dissected upland in the north of the province, largely beyond the reach
+of the canal network that irrigates the southern plains. Agriculture here is
+overwhelmingly rain-fed, and where surface water is absent the population turns
+to dug wells, boreholes, and small rainwater-harvesting structures
+\cite{ejaz2023soilwater,hafeez2025rwh}. The climate is semi-arid, rainfall is
+unevenly distributed across the year, and large tracts of barren and degraded
+land limit natural recharge \cite{khan2024afforestation}. Deciding where to
+sink a new well, or where to site a recharge structure, therefore carries real
+economic weight for farmers and planners alike---and at present that decision
+is made with very little spatial guidance.
+
+\section{Groundwater Potential Mapping}
+\label{sec:gwpm}
+
+Groundwater potential mapping (GWPM) is the standard response to this kind of
+question. The idea is straightforward: groundwater occurrence is controlled by
+a handful of measurable surface and near-surface factors---geology and soil,
+slope and drainage, rainfall, vegetation, and so on---so a map that combines
+these factors sensibly should highlight the areas most likely to hold usable
+groundwater. The factors are derived from remote sensing and digital elevation
+data, brought together in a geographic information system (GIS), and merged
+into a single potential surface that is usually classified into a few ordinal
+zones such as \emph{low}, \emph{medium}, and \emph{high}.
+
+For the better part of two decades the dominant way of combining those factors
+has been a knowledge-driven weighted overlay, most often structured through the
+analytic hierarchy process (AHP). An expert assigns each factor a weight that
+reflects its presumed influence on groundwater, the layers are summed, and the
+result is broken into classes. The approach has been applied successfully in a
+wide range of settings---the Western Ghats of India \cite{arulbalaji2019gisahp},
+the Pravara basin of Maharashtra \cite{das2018pravara}, semi-arid catchments in
+India and Saudi Arabia \cite{pande2021ahpmif,mallick2019fuzzyahp}, and
+crystalline hard-rock terrain in Morocco \cite{benjmel2020morocco}, among many
+others. Its appeal is obvious: it is transparent, it encodes genuine hydrogeological
+knowledge, and it works even where no field measurements exist.
+
+That same strength is also its main weakness. The weights are fixed in advance
+by judgement, not learned from data, and different experts will reasonably
+disagree about them. The method assumes that factors combine in a simple linear,
+additive way, which need not hold when, for example, rainfall only matters where
+the soil is permeable enough to let it infiltrate. And because the output is a
+single deterministic surface, it offers no internal estimate of accuracy and no
+straightforward way to ask which factors actually drove the result. Comparative
+studies that place weighted-overlay methods alongside statistical and
+data-driven alternatives have repeatedly found the data-driven models to be
+competitive or better, precisely because they relax these assumptions
+\cite{arabameri2018shahroud}.
+
+Machine learning (ML) offers a route around the fixed-weight problem. Rather
+than being told how to combine the factors, an ML model is shown examples and
+left to learn the combination---including nonlinear interactions and
+factor-specific thresholds---directly from the data. Over the past decade ML
+has moved from the margins to the mainstream of hydrology and water-resources
+research, with applications spanning groundwater-level forecasting, water-quality
+assessment, and a broad family of spatial susceptibility problems
+\cite{sit2020deeplearning,hai2022gwlreview,zhu2022mlwaterquality}. Tree-based
+ensembles in particular---random forests and gradient-boosted trees---have
+become a default choice for spatial mapping, both because they handle mixed,
+correlated predictors gracefully and because they expose feature-importance
+measures that keep the model interpretable. The same machinery that has proved
+effective for landslide and flood susceptibility mapping transfers naturally to
+groundwater potential, which is structurally the same problem: predicting an
+ordinal spatial class from a stack of geo-environmental layers.
+
+\section{Problem Statement}
+\label{sec:problem}
+
+The most directly relevant prior study for this work is that of Waqas et al.
+\cite{waqas2022chakwal}, who assessed groundwater potential in Chakwal District
+using a GIS and remote-sensing weighted overlay built on five thematic layers.
+It is a useful and locally grounded study, but it leaves several gaps open.
+It covers a single administrative district rather than the plateau as a whole,
+so it cannot describe how potential varies across the wider region. It relies
+on the manual weighted-overlay method, with all of the subjectivity and the
+absence of a quantitative accuracy estimate that this implies. And it uses a
+relatively small set of input factors, omitting several variables---soil
+texture, a wetness index, surface temperature, and spectral water and
+vegetation indices---that later work has shown to be informative.
+
+More broadly, while ML has been applied to closely related problems in the
+Pothohar region, including rainfall--runoff simulation across four of its basins
+\cite{khan2023rainfallrunoff}, and while recent AHP-based mapping has addressed
+rainwater-harvesting potential over the same upland \cite{hafeez2025rwh}, there
+is to date no machine-learning groundwater potential map covering the full
+five-district plateau at fine resolution. The methodological shift from manual
+overlay to learned models, which is by now well established elsewhere, has not
+yet been carried through for this study area. That is the gap this thesis sets
+out to close.
+
+\section{Research Gap}
+\label{sec:gap}
+
+Drawing the preceding observations together, three specific shortcomings define
+the gap addressed here:
+
+\begin{itemize}
+  \item \textbf{Spatial coverage.} Existing groundwater potential assessments in
+        the region are confined to single districts. No consistent,
+        full-resolution map spans the entire \studyarea{} (Chakwal, Rawalpindi,
+        Attock, Jhelum, and Mianwali).
+  \item \textbf{Methodology.} Prior regional mapping relies on knowledge-driven
+        weighted overlay or AHP, with subjectively assigned weights, linear
+        additive combination, and no quantitative measure of predictive
+        performance.
+  \item \textbf{Feature set and validation.} Earlier studies use a limited
+        number of thematic layers and validate, where they validate at all,
+        against secondary data alone. A richer multi-sensor feature set and an
+        explicit, evidence-based validation strategy have not been brought
+        together for this area.
+\end{itemize}
+
+\section{Aim and Objectives}
+\label{sec:objectives}
+
+The aim of this thesis is to develop and validate a machine-learning framework
+for groundwater potential mapping of the \studyarea{}, extending the
+weighted-overlay approach of Waqas et al. \cite{waqas2022chakwal} from a single
+district to the full plateau and from a manual method to a learned one. The
+specific objectives are:
+
+\begin{enumerate}
+  \item To assemble a consistent, nine-feature geo-environmental dataset for the
+        five-district plateau at 30~m resolution using Google Earth Engine,
+        drawing on Landsat~8, SRTM, CHIRPS, MODIS, and SoilGrids.
+  \item To generate groundwater potential reference labels through a transparent,
+        knowledge-based weighted overlay, so that the learned models have a
+        defensible target grounded in established hydrogeological reasoning.
+  \item To train and compare four supervised classifiers---random forest,
+        XGBoost, LightGBM, and a soft-voting ensemble---and to select the
+        best-performing model on held-out data.
+  \item To produce a full-resolution groundwater potential map of the plateau and
+        to quantify the spatial distribution of low, medium, and high potential
+        zones.
+  \item To examine which geo-environmental factors most strongly govern the
+        predictions, and to interpret these in hydrogeological terms.
+  \item To assess the real-world credibility of the map through an independent,
+        spatial-realism validation rather than internal accuracy alone.
+\end{enumerate}
+
+\section{Research Questions}
+\label{sec:questions}
+
+The objectives translate into four questions that the remainder of the thesis
+answers in turn:
+
+\begin{enumerate}
+  \item Can a supervised machine-learning model reproduce, and then refine, a
+        knowledge-based groundwater potential assessment across the full
+        \studyarea{}?
+  \item Which of the candidate classifiers performs best, and how large is the
+        difference between them in practice?
+  \item Which geo-environmental features carry the most weight in the model's
+        decisions, and are these consistent with the known hydrogeology of the
+        plateau?
+  \item Does the resulting map agree with independent evidence---known productive
+        sites, the spatial structure of recharge, and findings from comparable
+        regional studies---beyond merely reproducing its own training labels?
+\end{enumerate}
+
+\section{Scope and Limitations}
+\label{sec:scope}
+
+A few boundaries on the work should be stated plainly at the outset. The study
+area is limited to the five districts of the \studyarea{}, and all analysis is
+carried out at the 30~m native resolution of the SRTM and Landsat inputs. Nine
+geo-environmental features are used; subsurface lithology, which would ideally
+enter as a tenth layer, was not available in digitized form for the full
+plateau and is therefore treated as a known limitation rather than an input.
+
+The most important caveat concerns the training labels. Because field
+measurements of groundwater are not available across the whole plateau, the
+reference labels are themselves derived from the same satellite features through
+a weighted overlay. The machine-learning models are thus trained to reproduce a
+knowledge-based product, and their high internal accuracy must be read in that
+light: it measures how faithfully the model reproduces the overlay, not how well
+it matches ground truth. This is a recognized constraint of data-scarce GWPM,
+and rather than gloss over it, the thesis confronts it directly by validating
+the final map against \emph{independent} evidence---published well sites,
+rain-gauge-based recharge zones, and comparable regional studies---in what is
+described here as a spatial-realism validation. The reasoning behind this choice
+is developed in Chapters~\ref{ch:methodology} and~\ref{ch:results}.
+
+\section{Significance and Contributions}
+\label{sec:significance}
+
+This thesis makes the following contributions:
+
+\begin{itemize}
+  \item It delivers the first machine-learning groundwater potential map of the
+        full five-district \studyarea{} at 30~m resolution, replacing manual
+        weighted overlay with a learned model while retaining hydrogeological
+        interpretability.
+  \item It expands the feature set from the five layers of the reference study to
+        nine, incorporating soil texture, a topographic wetness index, land
+        surface temperature, and spectral indices, and quantifies the
+        contribution of each.
+  \item It provides a systematic comparison of four classifiers on a balanced
+        450,000-sample dataset, reporting accuracy, macro $F_1$, Cohen's
+        $\kappa$, and ROC-AUC, alongside cross-validated stability.
+  \item It introduces an honest, evidence-based validation strategy suited to
+        data-scarce settings, demonstrating how a map built on knowledge-based
+        labels can nonetheless be checked against independent hydrogeological
+        reality.
+  \item It produces reusable geospatial outputs---classified and probability
+        rasters, and a full set of publication-quality figures---that can support
+        district-level groundwater planning by local agencies.
+\end{itemize}
+
+\section{Study Area at a Glance}
+\label{sec:studyarea_intro}
+
+Figure~\ref{fig:intro_studyarea} locates the \studyarea{} within Pakistan and
+shows the five districts that make up the analysis region. A fuller description
+of the area's physiography, climate, and hydrogeology is given in
+Section~\ref{sec:study_area}.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.95\textwidth]{Fig0_Study_Area}
+  \caption{Location of the \studyarea{} study area in northern Punjab, Pakistan,
+           showing the five constituent districts---Chakwal, Rawalpindi, Attock,
+           Jhelum, and Mianwali---over a shaded-relief base. The plateau covers
+           approximately \SI{25000}{\kilo\meter\squared}.}
+  \label{fig:intro_studyarea}
+\end{figure}
+
+\section{Thesis Organization}
+\label{sec:organization}
+
+The remainder of the thesis is organized as follows.
+Chapter~\ref{ch:literature} reviews the literature on groundwater potential
+mapping, the geo-environmental controls on groundwater, and the move from
+knowledge-driven overlay to machine-learning methods, situating the present work
+within that progression. Chapter~\ref{ch:methodology} describes the study area in
+detail and sets out the full methodology: data collection through Google Earth
+Engine, preprocessing, weighted-overlay label generation, construction of the
+training dataset, the four classifiers, and the validation design.
+Chapter~\ref{ch:results} reports the results---exploratory analysis of the
+features, comparative model performance, feature importance, the final
+groundwater potential map, and the spatial-realism validation.
+Chapter~\ref{ch:discussion} interprets these findings hydrogeologically, compares
+them against the reference study and other regional work, and confronts the
+label-circularity limitation head-on. Chapter~\ref{ch:conclusion} summarizes the
+contributions, notes the limitations, and outlines directions for future
+work---chief among them the addition of a lithological layer and the
+incorporation of field-measured well data.

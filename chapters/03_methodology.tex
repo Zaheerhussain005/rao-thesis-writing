@@ -1,0 +1,361 @@
+% ============================================================
+%  Chapter 3 — Methodology
+% ============================================================
+\chapter{Methodology}
+\label{ch:methodology}
+
+\section{Study Area}
+\label{sec:study_area}
+
+The \studyarea{} occupies the northern part of Punjab province, a dissected
+upland set between the Indus River to the west and the Jhelum River to the east.
+For this study the plateau is defined by its five constituent administrative
+districts---Chakwal, Rawalpindi, Attock, Jhelum, and Mianwali---which together
+cover approximately \SI{25000}{\kilo\meter\squared} between roughly
+\ang{32.16}--\ang{34.02}~N and \ang{71.11}--\ang{73.82}~E. The location and
+extent of the area are shown in Figure~\ref{fig:intro_studyarea} of
+Chapter~\ref{ch:introduction}.
+
+Physiographically the plateau is far from uniform, and this heterogeneity is
+central to the groundwater problem. The north, around Rawalpindi and Attock, is
+higher, wetter, and underlain in places by coarse alluvial fans; the south and
+southwest grade into the drier plains toward Mianwali and the folded sedimentary
+ridges of the Salt Range and Kala Chitta Range. Drainage is organized chiefly
+around the Soan River and its tributaries, the plateau's principal internal
+watershed, together with the Haro and smaller systems
+\cite{sarwar2022soandrought}. The climate is semi-arid, with mean annual
+rainfall increasing broadly from the southwest toward the wetter northeast---on
+the order of \SIrange{380}{600}{\milli\meter}, concentrated in the summer monsoon
+between July and September \cite{hafeez2025rwh}. Because the area lies largely
+outside the canal-irrigation command of the southern Punjab plains, agriculture
+is predominantly rain-fed (\emph{barani}), and the population depends heavily on
+groundwater drawn from both the alluvial aquifers along the river valleys and the
+fractured hard-rock aquifers of the uplands \cite{waqas2022chakwal}. The
+juxtaposition of permeable alluvium against near-impermeable crystalline and
+folded rock is what makes groundwater potential vary so sharply across the
+plateau, and is the spatial signal this study aims to capture.
+
+\section{Methodological Overview}
+\label{sec:overview}
+
+The workflow proceeds in five stages, summarized in
+Figure~\ref{fig:methodology}: (i)~collection of nine geo-environmental features
+from satellite and reanalysis archives through Google Earth Engine (GEE);
+(ii)~preprocessing of these layers into a co-registered, normalized feature
+stack; (iii)~generation of three-class groundwater potential labels by a
+knowledge-based weighted overlay; (iv)~training and comparison of four supervised
+classifiers on a balanced sample, followed by application of the best model to
+the full plateau; and (v)~validation of the resulting map against independent
+evidence. Each stage is described in turn below.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.92\textwidth]{Fig1_Methodology}
+  \caption{Overall methodological workflow, from Google Earth Engine data
+           collection through preprocessing, weighted-overlay label generation,
+           machine-learning model training, prediction, and spatial-realism
+           validation.}
+  \label{fig:methodology}
+\end{figure}
+
+\section{Data Sources}
+\label{sec:data_sources}
+
+Nine features were selected to represent the terrain, climate, vegetation,
+moisture, and soil controls on groundwater identified in
+Chapter~\ref{ch:literature}. All were obtained through Google Earth Engine,
+which provides analysis-ready access to the underlying archives and removes the
+need to download and mosaic raw scenes. Table~\ref{tab:data_sources} lists each
+feature, its source dataset, and its Pearson correlation with the groundwater
+potential label (discussed further in Chapter~\ref{ch:results}).
+
+\begin{table}[H]
+\centering
+\caption{The nine input features, their source datasets in Google Earth Engine,
+         and their Pearson correlation ($r$) with the groundwater potential label.}
+\label{tab:data_sources}
+\small
+\begin{tabular}{clll c}
+\toprule
+\# & Feature & Source & GEE dataset & $r$ \\
+\midrule
+1 & Elevation & SRTM            & \texttt{USGS/SRTMGL1\_003}                 & $+0.234$ \\
+2 & Slope     & SRTM-derived    & \texttt{ee.Terrain.slope()}                & $+0.051$ \\
+3 & Aspect    & SRTM-derived    & \texttt{ee.Terrain.aspect()}               & $+0.060$ \\
+4 & TWI       & SRTM + HydroSHEDS & \texttt{WWF/HydroSHEDS/15ACC}            & $+0.185$ \\
+5 & NDVI      & Landsat-8       & \texttt{LANDSAT/LC08/C02/T1\_L2}           & $+0.240$ \\
+6 & NDWI      & Landsat-8       & \texttt{LANDSAT/LC08/C02/T1\_L2}           & $-0.222$ \\
+7 & Rainfall  & CHIRPS          & \texttt{UCSB-CHG/CHIRPS/DAILY}             & $+0.514$ \\
+8 & Soil      & SoilGrids       & \texttt{OpenLandMap/SOL/SOL\_TEXTURE}      & $+0.836$ \\
+9 & LST       & MODIS           & \texttt{MODIS/061/MOD11A1}                 & $-0.426$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Three of these sources warrant specific mention. Soil texture was taken from
+SoilGrids~2.0 \cite{poggio2021soilgrids}, a global digital soil-mapping product
+generated with quantile regression forests trained on roughly 240,000 soil
+profiles and more than 400 environmental covariates, with cross-validated,
+spatially explicit uncertainty. It is the most comprehensive openly available
+soil dataset, and---as Chapter~\ref{ch:results} shows---soil texture proved the
+single strongest predictor in this study, consistent with its established control
+on infiltration and aquifer permeability. The vegetation and water indices (NDVI
+and NDWI) were derived from Landsat-8 Collection~2 surface-reflectance imagery
+\cite{wulder2019landsat}. The terrain derivatives---elevation, slope, aspect, and
+the topographic wetness index---were computed from the 30~m SRTM digital
+elevation model; the choice of 30~m resolution is supported by Chang et al.
+\cite{chang2019scaleeffects}, who found 30~m DEM derivatives to give the best
+model accuracy among the resolutions they tested. The topographic wetness index
+itself follows the standard TOPMODEL formulation of Beven and Kirkby
+\cite{beven1979topmodel}, combining upslope contributing area (from the
+HydroSHEDS flow-accumulation grid) with local slope, and cumulative rainfall was
+summed from CHIRPS daily precipitation over the 2015--2023 period.
+
+\section{Data Collection and Export}
+\label{sec:collection}
+
+Each feature was assembled in GEE as a single-band image, clipped to the union
+of the five FAO/GAUL district polygons, and cast to floating point to avoid
+type-mismatch errors when bands of different native types are combined. The nine
+bands were stacked and exported as a single multi-band GeoTIFF at 30~m
+resolution in geographic coordinates (EPSG:4326). The exported raster spans
+$10{,}062 \times 6{,}884$ pixels---about 69.2~million cells---of which
+\npixels{} (53.4\%) fall inside the district boundaries and carry valid data;
+the remainder are nodata outside the study area. For metric calculations such as
+area and distance, the data were reprojected to UTM Zone~42N (EPSG:32642).
+
+\section{Preprocessing}
+\label{sec:preprocessing}
+
+Three preprocessing steps prepared the exported stack for analysis, all
+implemented in Python with the \texttt{rasterio} library. First, pixels outside
+the five district polygons were masked to nodata, fixing the valid-pixel count at
+\npixels{}. Second, each band was independently rescaled to the interval
+$[0,1]$ by min--max normalization (Equation~\ref{eq:minmax}), so that features
+measured in very different units---metres, degrees, millimetres, index values---
+contribute on a common scale and no single feature dominates by magnitude alone:
+
+\begin{equation}
+  x_{\text{norm}} = \frac{x - x_{\min}}{x_{\max} - x_{\min}}.
+  \label{eq:minmax}
+\end{equation}
+
+Third, a quality check confirmed that all nine bands contained no missing values
+within the valid mask and that every normalized band spanned the full $[0,1]$
+range, ruling out constant or degenerate layers. The normalized stack and a
+parallel table of pixel row/column indices (used later to reconstruct maps from
+tabular predictions) formed the input to all subsequent steps.
+
+\section{Feature Maps}
+\label{sec:feature_maps}
+
+Figure~\ref{fig:feature_panel} presents the nine normalized feature layers across
+the plateau. Several of the spatial patterns anticipated in
+Section~\ref{sec:study_area} are visible: rainfall and vegetation increase toward
+the wetter north and northeast, surface temperature is highest over the exposed
+southern terrain, and the wetness index picks out the valley floors and
+low-lying tracts. These layers are the common input both to the weighted-overlay
+labelling described next and to the machine-learning models.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\textwidth]{Fig3_Feature_Maps_Panel}
+  \caption{The nine normalized geo-environmental input features across the
+           \studyarea{}: elevation, slope, aspect, topographic wetness index,
+           NDVI, NDWI, rainfall, soil texture, and land surface temperature.}
+  \label{fig:feature_panel}
+\end{figure}
+
+\section{Label Generation by Weighted Overlay}
+\label{sec:labels}
+
+Because field measurements of groundwater are not available across the whole
+plateau, reference labels for supervised training were generated using a
+knowledge-based weighted overlay---an established approach in GIS-based spatial
+mapping, and the same family of method used by the reference study
+\cite{waqas2022chakwal} and validated as a labelling strategy by Roy and Saha
+\cite{roy2019knowledgedriven} and others \cite{arulbalaji2019gisahp,pande2021ahpmif}.
+Each normalized feature $f_i$ was assigned a weight $w_i$ reflecting its
+hydrogeological influence on groundwater potential, and the weights were combined
+into a single composite score $S$ for every pixel:
+
+\begin{equation}
+  S = \sum_{i=1}^{9} w_i \, f_i^{*},
+  \label{eq:overlay}
+\end{equation}
+
+where $f_i^{*} = f_i$ for features that promote groundwater and
+$f_i^{*} = 1 - f_i$ for features that suppress it. Features inversely related to
+potential---slope, elevation, and land surface temperature---were inverted in
+this way before weighting, so that, for instance, gentler slopes and cooler
+(less evaporative) surfaces raise the score. The weights, listed in
+Table~\ref{tab:weights}, give the largest influence to soil texture, the wetness
+index, and rainfall, in line with both the hydrogeology of the area and the
+correlations in Table~\ref{tab:data_sources}.
+
+\begin{table}[H]
+\centering
+\caption{Feature weights and direction of influence used in the weighted-overlay
+         label generation.}
+\label{tab:weights}
+\begin{tabular}{lcc}
+\toprule
+Feature & Weight (\%) & Direction \\
+\midrule
+Soil texture & 25 & Direct ($+$) \\
+TWI          & 20 & Direct ($+$) \\
+Rainfall     & 20 & Direct ($+$) \\
+NDVI         & 10 & Direct ($+$) \\
+Slope        & 10 & Inverse ($-$) \\
+NDWI         &  5 & Direct ($+$) \\
+Elevation    &  5 & Inverse ($-$) \\
+LST          &  3 & Inverse ($-$) \\
+Aspect       &  2 & Direct ($+$) \\
+\midrule
+\textbf{Total} & \textbf{100} & \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The continuous score was then divided into three ordinal classes using fixed
+percentile thresholds: the lowest 40\% of scores were labelled \emph{Low}
+potential (class~0), the 40th--80th percentile \emph{Medium} (class~1), and the
+top 20\% \emph{High} (class~2). This 40/40/20 split reflects the expectation that
+high-potential ground is the minority of a semi-arid plateau, and it fixes the
+overall class balance of the reference map. The resulting label map is shown in
+Figure~\ref{fig:label_map}.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.85\textwidth]{gw_potential_label_map}
+  \caption{Groundwater potential reference labels generated by the
+           weighted-overlay model: Low (40\%), Medium (40\%), and High (20\%)
+           potential zones across the \studyarea{}.}
+  \label{fig:label_map}
+\end{figure}
+
+It is worth restating plainly what these labels are and are not. They encode
+hydrogeological knowledge applied to the satellite features, not direct
+observations of groundwater. A model trained on them therefore learns to
+reproduce that knowledge-based product, and its internal accuracy measures
+fidelity to the overlay rather than to ground truth. This is an accepted
+limitation of GWPM in data-scarce regions; the response adopted here is not to
+pretend otherwise but to validate the final map against independent evidence, as
+described in Section~\ref{sec:validation_design} and Chapter~\ref{ch:results}.
+
+\section{Training Dataset Construction}
+\label{sec:training_data}
+
+Training every model on all \npixels{} labelled pixels would be both
+computationally wasteful and statistically skewed by the fixed 40/40/20 class
+proportions. Instead, a balanced sample of 450,000 pixels was drawn---150,000
+from each of the three classes---by stratified random sampling. Balancing the
+classes prevents the models from favouring the majority classes and makes
+metrics such as macro $F_1$ directly interpretable. The sample was partitioned
+into 72\% training, 8\% validation, and 20\% test subsets, leaving 90,000 pixels
+held out for final evaluation. The decision to fix and report this split
+explicitly follows Nguyen et al. \cite{nguyen2021datasplitting}, who showed that
+the partitioning scheme materially affects reported performance and should not be
+left implicit.
+
+\section{Machine-Learning Models}
+\label{sec:ml_models}
+
+Four classifiers were trained on the same data so that their performance could be
+compared directly. They were chosen to span the two dominant tree-ensemble
+strategies---bagging and boosting---and their combination:
+
+\begin{itemize}
+  \item \textbf{Random Forest (RF).} An ensemble of 300 decision trees grown on
+        bootstrapped samples with Gini-impurity splits and a $\sqrt{9}$ feature
+        subsample at each node \cite{liaw2007randomforest,tyralis2019randomforests}.
+  \item \textbf{XGBoost.} Regularized gradient-boosted trees
+        \cite{chen2016xgboost}, with learning rate 0.1, maximum depth 6, 300
+        estimators, and 0.8 row/column subsampling.
+  \item \textbf{LightGBM.} Histogram-based, leaf-wise gradient boosting
+        \cite{ke2017lightgbm}, with 500 estimators, learning rate 0.05, and a
+        minimum of 30 samples per leaf.
+  \item \textbf{Voting Ensemble.} A soft-voting combination of the three models
+        above with equal weights, averaging their predicted class probabilities.
+\end{itemize}
+
+All models were implemented in Python using \texttt{scikit-learn},
+\texttt{xgboost}, and \texttt{lightgbm}. The comparison is deliberately aligned
+with prior susceptibility-mapping work---most directly Sahin
+\cite{sahin2020ensembletree}, who compared the same boosting and bagging
+families---so that the model ranking obtained here can be read against an
+external benchmark.
+
+\section{Evaluation Metrics}
+\label{sec:metrics}
+
+Model performance was assessed on the 90,000-pixel test set using several
+complementary measures rather than accuracy alone, since accuracy can be
+misleading even on balanced data. Overall accuracy is reported alongside the
+macro-averaged $F_1$-score, which weights all three classes equally; Cohen's
+$\kappa$, which corrects agreement for chance; and the one-vs-rest ROC-AUC, which
+summarizes class separability across decision thresholds. Per-class precision,
+recall, and $F_1$ are also reported. The use of agreement- and
+separability-based measures in addition to raw accuracy follows the
+recommendation of Chicco and Jurman \cite{chicco2020mcc}. To confirm that the
+results were not an artefact of a single partition, each model was additionally
+evaluated under five-fold cross-validation on the training set.
+
+\section{Prediction Map Generation}
+\label{sec:prediction}
+
+The best-performing model was then applied to all \npixels{} valid pixels to
+produce the full-resolution groundwater potential map. Because holding the entire
+feature stack in memory at once is impractical, prediction was carried out over
+the raster in $2048 \times 2048$ pixel tiles, with each tile's pixels classified
+in turn and written back to the output grid---twenty tiles in total, completing in
+roughly twenty minutes. Two outputs were produced: a classified GeoTIFF assigning
+each pixel to Low, Medium, or High potential, and a continuous raster giving the
+model's predicted probability of the High class, which preserves the gradational
+information lost in the hard classification and is used in the validation that
+follows.
+
+\section{Validation Design}
+\label{sec:validation_design}
+
+The central difficulty in validating this map is the one already noted: the
+training labels are themselves model-derived, so a high agreement between the
+prediction and the labels (reported in Chapter~\ref{ch:results}) confirms only
+that the learning succeeded, not that the map is hydrogeologically correct. A
+conventional well-by-well accuracy assessment was attempted but proved
+uninformative, because the publicly available monitoring wells for the region are
+not classified as productive or dry---they exist across both favourable and
+unfavourable ground---and many fell on nodata pixels at the district margins.
+
+The approach taken instead is what is termed here a \emph{spatial-realism
+validation}: rather than asking whether the map matches a noisy point-by-point
+ground truth, it asks whether the map's spatial structure agrees with independent
+lines of hydrogeological evidence. Four such checks were designed:
+
+\begin{enumerate}
+  \item \textbf{Known productive sites.} Published groundwater sites in the
+        Rawalpindi alluvial basin---ground that is known to be productive---were
+        overlaid on the map, and the predicted class and High-probability at each
+        were examined. A credible map should place these in the Medium or High
+        classes.
+  \item \textbf{Recharge-zone discrimination.} The independent network of
+        rain-gauge stations compiled by Khan et al. \cite{khan2023rainfallrunoff}
+        across the Pothohar basins was partitioned by hydrogeological setting into
+        alluvial and non-alluvial groups, and the predicted High-probability was
+        compared between groups using the Mann--Whitney $U$ test. Alluvial
+        stations should show significantly higher predicted potential.
+  \item \textbf{Cross-study consistency.} The predicted proportion of High
+        potential was compared against the suitability proportions reported by an
+        independent AHP study of the same region \cite{hafeez2025rwh}, to check
+        that the overall magnitude is consistent with prior regional work.
+  \item \textbf{District-scale gradient.} The fraction of each district classified
+        as High potential was ranked and tested against the expected
+        hydrogeological ordering (wetter, alluvial north versus drier, hard-rock
+        south) using the Spearman rank correlation.
+\end{enumerate}
+
+Together these checks assess whether the map is right for the right reasons,
+using evidence that played no part in its construction. Their results are
+reported in Section~\ref{sec:validation_results}, and their interpretation, along
+with the limitations of the approach, is taken up in
+Chapter~\ref{ch:discussion}.

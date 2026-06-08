@@ -1,0 +1,262 @@
+% ============================================================
+%  Chapter 2 — Literature Review
+% ============================================================
+\chapter{Literature Review}
+\label{ch:literature}
+
+\section{Overview}
+\label{sec:lit_overview}
+
+The study of where groundwater accumulates, and how to map it from the surface,
+sits at the intersection of hydrogeology, remote sensing, and---more recently---
+machine learning. This chapter traces that intersection. It begins with the
+geo-environmental factors that the literature has settled on as the principal
+controls on groundwater occurrence, since these are the raw material of every
+potential map. It then follows the methodological arc that GWPM research has
+taken over the last two decades: from knowledge-driven weighted overlay and the
+analytic hierarchy process, through bivariate and multivariate statistical
+techniques, to the tree-based machine-learning models that now dominate spatial
+prediction. A separate section examines the broader uptake of machine learning
+in hydrology, which supplies both the methods and the justification for applying
+them here. The chapter closes by drawing together what has, and has not, been
+done in the \studyarea{} and its surrounding region, which is where the gap this
+thesis addresses comes into focus.
+
+\section{Geo-environmental Controls on Groundwater}
+\label{sec:lit_factors}
+
+There is broad agreement in the literature about which surface and near-surface
+variables govern groundwater occurrence, even if the exact list varies from one
+study to the next. Geology and soil set the stage: lithology determines the
+storage and transmission properties of the subsurface, while soil texture
+controls how readily rainfall infiltrates rather than running off. Terrain
+matters through slope and the drainage network---gentle slopes and low-lying,
+convergent areas favour accumulation, steep slopes favour runoff. Climate enters
+chiefly through rainfall, the ultimate source of recharge. Vegetation and
+moisture, captured through spectral indices, and surface temperature, a proxy
+for evapotranspiration, round out the picture.
+
+Arulbalaji et al. \cite{arulbalaji2019gisahp} offer a representative example of
+how comprehensive these factor stacks can become, integrating twelve thematic
+layers---geology, geomorphology, land use, lineament density, drainage, rainfall,
+soil, slope, roughness, topographic wetness index (TWI), topographic position,
+and curvature---in their assessment of the Western Ghats. Most studies work with
+a smaller but overlapping subset. The topographic wetness index, introduced by
+Beven and Kirkby \cite{beven1979topmodel} as part of the TOPMODEL framework,
+recurs across the GWPM literature because it compactly expresses the tendency of
+a location to accumulate water based on its upslope contributing area and local
+slope. Morphometric analyses of drainage basins reinforce the same theme, linking
+network properties such as drainage density and stream order to infiltration and
+groundwater prospects \cite{mahala2019morphometric,kumar2018morphometric}.
+
+The practical upshot for this thesis is that the nine features adopted here---
+elevation, slope, aspect, TWI, NDVI, NDWI, rainfall, soil texture, and land
+surface temperature---are not an arbitrary selection but a subset that recurs
+throughout the GWPM literature, chosen for being derivable consistently from
+freely available remote-sensing archives across the whole plateau.
+
+\section{Knowledge-Driven Methods: Weighted Overlay and AHP}
+\label{sec:lit_ahp}
+
+For most of the field's history, the standard way to turn a stack of factor
+layers into a potential map has been knowledge-driven weighted overlay, very
+often organized through the analytic hierarchy process. In AHP, the analyst
+compares factors pairwise, derives a set of weights from those comparisons,
+checks the weights for logical consistency, and then combines the weighted layers
+into a single surface. The method has been applied across a remarkable range of
+climates and terrains, which is part of why it remains a sensible baseline.
+
+In semi-arid India, Pande et al. \cite{pande2021ahpmif} compared AHP against the
+multi-influencing-factor (MIF) technique in the Mula River basin and found AHP
+the stronger of the two, with a validation AUC of 0.86 against 0.80 for MIF. Das
+and Pardeshi \cite{das2018pravara} took a related but distinct route in the
+Pravara basin, using frequency-ratio and influencing-factor statistics over eight
+hydrogeological layers and reporting AUC values of 0.73 and 0.69 respectively.
+The transferability of these ideas to water-scarce settings closely resembling
+the Pothohar is well illustrated by Mallick et al. \cite{mallick2019fuzzyahp},
+who applied a fuzzy variant of AHP in the arid Aseer region of Saudi Arabia using
+geology, lineaments, geomorphology, NDVI, TWI, slope, and soil. In hard-rock
+crystalline terrain---directly relevant to the Salt Range and Kala Chitta
+exposures of the study area---Benjmel et al. \cite{benjmel2020morocco} showed
+that lineament density and geological structure become the dominant controls,
+with fracture zones acting as conduits through otherwise near-impermeable rock.
+The same multi-criteria machinery extends naturally to related hazards; Swain et
+al. \cite{swain2020floodahp}, for instance, used a cloud-based GIS-AHP workflow
+for flood-susceptibility mapping, underlining how general the weighted-overlay
+paradigm has become.
+
+These studies establish weighted overlay as a credible, knowledge-grounded
+method---which is precisely why it is used here to generate training labels
+rather than being discarded. Its limitations are equally well documented,
+however. The weights are fixed by expert judgement and are therefore inherently
+subjective; the combination rule is linear and additive, which cannot represent
+the conditional dependencies that real hydrogeology exhibits; and the output is a
+single deterministic surface with no built-in measure of its own accuracy.
+Arabameri et al. \cite{arabameri2018shahroud}, comparing statistical,
+data-mining, and multi-criteria decision methods on the same plain in Iran, found
+the data-driven approaches generally matched or outperformed the knowledge-driven
+ones, which points directly toward the machine-learning methods considered next.
+
+\section{From Knowledge-Driven to Machine-Learning Methods}
+\label{sec:lit_ml_spatial}
+
+The migration from expert-weighted overlay to learned models has been most
+visible in spatial susceptibility mapping---a family of problems, including
+landslide, flood, and groundwater mapping, that share the same structure:
+predict an ordinal spatial class from a stack of geo-environmental predictors.
+Because the structure is shared, methods developed for one transfer readily to
+the others, and the landslide-susceptibility literature in particular has become
+a proving ground for the tree-based ensembles now common in GWPM.
+
+The most directly analogous study to the present work is that of Sahin
+\cite{sahin2020ensembletree}, who compared XGBoost, gradient boosting machine,
+and random forest for landslide susceptibility in Turkey using fifteen causative
+factors. XGBoost came out ahead, with an overall accuracy of 85.0\% and an AUC
+of 0.898, followed by random forest (AUC 0.886) and GBM (AUC 0.880); a Wilcoxon
+signed-rank test confirmed the differences were statistically significant. That
+ordering---XGBoost ahead of random forest, with gradient boosting close
+behind---anticipates the result obtained in this thesis, and lends external
+weight to the model ranking reported in Chapter~\ref{ch:results}. Wu et al.
+\cite{wu2019adaboost} explored a complementary corner of the ensemble space,
+pairing alternating decision trees with AdaBoost and bagging, which provides part
+of the rationale for including a voting ensemble among the candidate models here.
+
+Two further studies inform specific design choices. Chang et al.
+\cite{chang2019scaleeffects} examined how the resolution of DEM-derived
+topographic variables affects model accuracy, comparing five-metre LiDAR,
+resampled thirty-metre LiDAR, and thirty-metre ASTER data; the thirty-metre
+derivatives performed best, which supports the use of SRTM thirty-metre data for
+elevation, slope, aspect, and TWI in this work. They also found non-parametric
+models such as random forest and support vector machines to outperform
+parametric logistic regression, consistent with the wider trend toward tree-based
+methods. On the question of how to split data for honest evaluation, Nguyen et
+al. \cite{nguyen2021datasplitting} showed that the train--validation--test
+partition materially affects reported performance, which motivates the explicit
+72/8/20 split adopted in Chapter~\ref{ch:methodology}.
+
+Perhaps the most important methodological precedent concerns the labels
+themselves. Because field measurements are rarely dense enough to cover an entire
+study area, several authors have trained models on knowledge-driven labels rather
+than on sparse observations. Roy and Saha \cite{roy2019knowledgedriven}
+demonstrated that expert-weighted factor combinations---built from rainfall,
+slope, aspect, geology, soil, NDVI, and TWI---can serve as reliable spatial
+targets, achieving ROC-AUC values around 0.91. This is the same logic that
+underpins the weighted-overlay labelling used here, and it is worth being clear
+about what it does and does not buy: it provides spatially complete, theoretically
+grounded targets, but it also means a model's internal accuracy measures fidelity
+to the overlay rather than to ground truth---a point taken up squarely in
+Chapters~\ref{ch:results} and~\ref{ch:discussion}.
+
+\section{Tree-Based Learning Algorithms}
+\label{sec:lit_algorithms}
+
+The models used in this thesis all belong to the tree-ensemble family, and a
+brief note on their lineage is warranted. Random forests build many decision
+trees on bootstrapped samples and randomized feature subsets and average their
+votes, which reduces variance and resists overfitting; their suitability for
+water-resources problems specifically has been reviewed by Tyralis et al.
+\cite{tyralis2019randomforests}, building on the widely used implementation
+described by Liaw and Wiener \cite{liaw2007randomforest}. Gradient boosting takes
+a different route, adding trees sequentially so that each new tree corrects the
+errors of those before it. XGBoost \cite{chen2016xgboost} made this approach both
+scalable and well regularized through a penalized objective and an efficient,
+parallelized tree-construction algorithm, and it has become one of the most
+widely used models in applied machine learning. LightGBM \cite{ke2017lightgbm}
+pushes efficiency further with histogram-based splitting and leaf-wise tree
+growth, which makes it well suited to the large pixel counts encountered in
+raster-scale prediction. The choice to compare random forest, XGBoost, LightGBM,
+and a soft-voting ensemble therefore spans the two dominant ensemble
+philosophies---bagging and boosting---plus their combination.
+
+A recurring theme in this literature is the importance of evaluating such models
+with more than a single accuracy figure, particularly when classes are balanced
+by construction. Chicco and Jurman \cite{chicco2020mcc} argue for agreement-based
+measures over raw accuracy, and the present work accordingly reports macro
+$F_1$, Cohen's $\kappa$, and ROC-AUC alongside accuracy.
+
+\section{Machine Learning in Hydrology and Water Resources}
+\label{sec:lit_ml_hydrology}
+
+Stepping back from spatial mapping, the past few years have seen machine learning
+become a standard tool across hydrology more generally, which provides the wider
+context for its use here. Sit et al. \cite{sit2020deeplearning} survey the rapid
+adoption of deep-learning methods across the water sciences, from rainfall-runoff
+modelling to flood forecasting. Closer to the present topic, Hai et al.
+\cite{hai2022gwlreview} review machine-learning models for groundwater-level
+prediction specifically, documenting both the breadth of methods in use and the
+recurring difficulty of obtaining adequate ground-truth data---the same
+constraint that shapes the validation strategy of this thesis. Zhu et al.
+\cite{zhu2022mlwaterquality} extend the picture to water-quality evaluation. Read
+together, these reviews establish that data-driven modelling is now mainstream in
+the field, while also being candid about its dependence on data availability,
+which is rarely ideal in the regions where the need is greatest.
+
+\section{Groundwater and Water Resources in the Pothohar Region}
+\label{sec:lit_regional}
+
+Bringing the focus back to the study area, a cluster of recent work has
+characterized the hydrology and environmental stresses of the \studyarea{} and
+the wider Punjab, even if none of it produces an ML groundwater potential map of
+the kind developed here.
+
+The closest methodological neighbour is Khan et al. \cite{khan2023rainfallrunoff},
+who applied machine-learning models---including stand-alone and wavelet-coupled
+neural networks and adaptive neuro-fuzzy systems---to simulate the
+rainfall--runoff process in four Pothohar basins, reaching Nash--Sutcliffe
+efficiencies as high as 0.92. Their work demonstrates both that data-driven
+models perform well in this rainfall-limited setting and that rainfall is the
+dominant driver of the region's hydrological response, a finding that resonates
+with the feature-importance results reported later in this thesis. The most
+spatially comparable study is Hafeez et al. \cite{hafeez2025rwh}, who used AHP to
+map rainwater-harvesting suitability across essentially the same five-district
+region, identifying roughly 45\% of the area as highly suitable for water storage.
+Because recharge-favourable terrain and storage-suitable terrain are governed by
+overlapping factors, their suitability map offers a useful independent reference
+against which the spatial pattern of this thesis can be sanity-checked, a
+comparison developed in Chapter~\ref{ch:discussion}.
+
+The remaining regional literature fills in the surrounding context. Sarwar et al.
+\cite{sarwar2022soandrought} document how meteorological droughts in the Soan
+basin---the plateau's principal drainage unit---propagate rapidly into
+hydrological droughts, underscoring the dependence of the region on groundwater
+buffering. Waseem et al. \cite{waseem2022drought} place this in a longer-term
+Punjab-wide frame, reporting declining agricultural water availability across
+several decades, while a separate review by Waseem et al.
+\cite{waseem2024waterquality} highlights shallow-aquifer contamination risk in the
+Rawalpindi--Islamabad twin-city area, a reminder that potential and potability are
+not the same thing. At the district scale, Khan et al. \cite{khan2024afforestation}
+describe the semi-arid, barren-land conditions of Attock, and Ejaz et al.
+\cite{ejaz2023soilwater} examine constraints on soil-and-water conservation
+practice across the Pothohar. Broader Punjab and Indus-basin studies---land-cover
+modelling with random forests \cite{asif2023lulc}, irrigation supply-and-demand
+projections \cite{ahmed2021indusbasin}, and urban water security
+\cite{kamran2024watersecurity}---complete the regional backdrop and reinforce the
+motivation set out in Chapter~\ref{ch:introduction}.
+
+\section{Synthesis and Research Gap}
+\label{sec:lit_synthesis}
+
+A few conclusions emerge from this survey. First, the set of geo-environmental
+controls on groundwater is well established, and the nine features used here sit
+comfortably within it. Second, knowledge-driven weighted overlay and AHP are
+proven, defensible methods---good enough to generate training labels---but their
+fixed weights, linear combination, and lack of an accuracy estimate are genuine
+limitations that data-driven models are designed to relax. Third, tree-based
+ensembles, and XGBoost in particular, have repeatedly outperformed both
+knowledge-driven and simpler statistical methods on structurally identical
+spatial-prediction problems, and the practice of training such models on
+knowledge-based labels is itself established. Fourth, machine learning is now firmly
+embedded in hydrology, including in the Pothohar region, yet its application there
+has been to rainfall-runoff and related problems rather than to groundwater
+potential mapping.
+
+The gap is therefore specific and, in light of the literature, somewhat
+conspicuous. The methodological shift from manual overlay to learned models has
+been completed for landslide and flood susceptibility, and for rainfall-runoff in
+the Pothohar itself, but not for groundwater potential across the full plateau.
+The reference study by Waqas et al. \cite{waqas2022chakwal} remains confined to a
+single district and a manual method with a limited feature set. This thesis sets
+out to close that gap: to carry the field's established methodological progression
+through to the \studyarea{}, on a richer nine-feature dataset, and---mindful of
+the label-circularity caveat raised repeatedly above---to validate the result
+against independent hydrogeological evidence rather than internal accuracy alone.

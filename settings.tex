@@ -9,10 +9,11 @@
 
 % ---- Fonts (XeLaTeX / fontspec) ----------------------------
 \usepackage{fontspec}
-% TeX Gyre Termes is a Times-compatible font bundled with TeX Live /
-% Overleaf, so it compiles anywhere. Swap to "Times New Roman" if your
-% institution requires the exact font and it is installed.
-\setmainfont{TeX Gyre Termes}
+% Default main font is Latin Modern (always available — no download), so
+% the document compiles on a fresh MiKTeX. To use a Times-style font for
+% final submission, install the "tex-gyre" package in the MiKTeX Console
+% then uncomment the line below:
+% \setmainfont{texgyretermes}[Extension=.otf,UprightFont=*-regular,BoldFont=*-bold,ItalicFont=*-italic,BoldItalicFont=*-bolditalic]
 \usepackage{microtype}
 
 % ---- Line spacing ------------------------------------------
@@ -21,8 +22,9 @@
 
 % ---- Math & units ------------------------------------------
 \usepackage{amsmath,amssymb}
-\usepackage{unicode-math}         % math fonts under XeLaTeX
-\setmathfont{TeX Gyre Termes Math}
+% (Math is set in Latin Modern Math, which XeLaTeX supports out of the
+%  box. unicode-math is intentionally NOT loaded — it requires a separate
+%  OpenType math font and is a common first-build failure point.)
 \usepackage{siunitx}              % \SI{25000}{\kilo\meter\squared}
 \sisetup{per-mode=symbol,detect-weight=true}
 

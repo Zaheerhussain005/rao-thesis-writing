@@ -1,14 +1,14 @@
 # ML-Based Groundwater Potential Mapping — Pothohar Plateau, Pakistan
 
-M.Sc. thesis project applying machine learning to identify groundwater potential zones (GWPZ) across the Pothohar Plateau, Punjab, Pakistan (23,204 km²).
+M.Sc. thesis project applying machine learning to identify groundwater potential zones (GWPZ) across the Pothohar Plateau, Punjab, Pakistan (~25,000 km²).
 
 ## Overview
 
 This study integrates multi-source geospatial data with ensemble machine learning models to produce a groundwater potential map for the Pothohar Plateau — a semi-arid region spanning five districts (Rawalpindi, Chakwal, Attock, Jhelum, Mianwali) where rainfed agriculture is critically dependent on groundwater.
 
-**Key features used:** Elevation, Slope, Aspect, TWI, NDVI, NDWI, Rainfall, Soil type, LST
+**Key features used:** Elevation, Slope, Aspect, TWI, NDVI, NDWI, Rainfall, Soil texture, LST (nine features, 30 m resolution, ~37 million valid pixels)
 
-**Models evaluated:** Random Forest, XGBoost, SVM, Logistic Regression (with cross-validation and AUC-ROC assessment)
+**Models evaluated:** Random Forest, XGBoost, LightGBM, and a soft-voting Ensemble (5-fold cross-validation, ROC-AUC, Cohen's κ). XGBoost was the best model (99.12% test accuracy, AUC 0.9998).
 
 ## Repository Structure
 
@@ -51,16 +51,17 @@ This study integrates multi-source geospatial data with ensemble machine learnin
 
 ## Compiling the Thesis
 
-Requires a LaTeX distribution (TeX Live, MiKTeX, or Overleaf).
+Requires a LaTeX distribution (TeX Live, MiKTeX, or Overleaf). **This document uses XeLaTeX** (for `fontspec`); it will *not* build with pdfLaTeX.
 
 ```bash
-pdflatex main
-bibtex main
-pdflatex main
-pdflatex main
+xelatex main
+bibtex  main
+xelatex main
+xelatex main
 ```
 
-Or open `main.tex` directly in Overleaf.
+On **Overleaf**: upload the repository, then set Menu → Compiler → **XeLaTeX**
+(the `% !TEX program = xelatex` line in `main.tex` usually sets this automatically).
 
 ## Study Area
 

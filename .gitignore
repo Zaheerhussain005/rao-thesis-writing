@@ -27,7 +27,8 @@ __pycache__/
 venv/
 *.egg-info/
 
-# Local Claude/MCP configuration (contains machine-specific paths)
+# Editor / Local config (contains machine-specific paths)
+.vscode/
 .claude/
 .mcp.json
 
